@@ -12,7 +12,7 @@ RUN pip install -r requirements.txt
 
 COPY api /sreality_anomaly_detector/api
 COPY model /sreality_anomaly_detector/model
-COPY sreality_anomaly_detector /sreality_anomaly_detector/sreality_detector
+COPY sreality_anomaly_detector /sreality_anomaly_detector/sreality_anomaly_detector
 
 
 EXPOSE 8000
