@@ -5,7 +5,7 @@ import sys
 
 import pandas as pd
 
-sys.path.append(r"C:\Users\pacak\PycharmProjects\sreality_detector")
+sys.path.append(r"C:\Users\pacak\PycharmProjects\sreality_anomaly_detector")
 
 from sreality_anomaly_detector.lgbm_inferor import (LGBMModelInferor,
                                             distance_from_centre,
@@ -90,6 +90,13 @@ def test_request_flat_data():
     assert len(obtained_json) >0
     assert type(obtained_json) == dict
 
+def test_load_model():
+    """Test _load method."""
+    model = LGBMModelInferor(model_config)
+    model._load_model()
+    # Check whether model is properly loaded by having
+    # model.model.best_iteration > 0
+    assert model.model.best_iteration > 0
 
 
 def test_predict():
