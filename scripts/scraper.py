@@ -40,8 +40,8 @@ class SrealityScraper:
     def obtain_ids_of_all_available_flats(self):
         """Collect ids of all available flats."""
         list_of_flat_ids = []
-        for page_number in tqdm(range(self.number_of_pages_to_scrap)):
-            # for page_number in tqdm(range(10)):
+        # for page_number in tqdm(range(self.number_of_pages_to_scrap)):
+        for page_number in tqdm(range(10)):
             url = (
                 f"https://www.sreality.cz/api/cs/v2/estates?category_sub_cb=4|5&category_main_cb=1&"
                 f"locality_region_id=10&category_type_cb=1&per_page={SCRAPE_FLATS_PER_PAGE}&page={page_number}"
@@ -71,8 +71,8 @@ class SrealityScraper:
     def create_and_save_df_with_data(self):
         """Create and save dataframe with all scraped flats."""
         list_of_dicts = []
-        for flat_id in tqdm(self.list_of_flat_ids):  # too long
-            # for flat_id in tqdm(self.list_of_flat_ids[:100]):
+        # for flat_id in tqdm(self.list_of_flat_ids):  # too long
+        for flat_id in tqdm(self.list_of_flat_ids[:100]):
             flat_api_response = self.request_one_flat(flat_id)
             one_flat_details = extract_one_flat_details(flat_api_response)
 
@@ -84,7 +84,7 @@ class SrealityScraper:
         dataframe.to_csv(name, header=True, index=False)
 
     def scrape_pipeline(self):
-        """One function that wrapps all steps."""
+        """One function that wraps all steps."""
         self.count_number_of_pages_needed()
         self.obtain_ids_of_all_available_flats()
         self.create_and_save_df_with_data()

@@ -1,4 +1,5 @@
 """Training class for flat prices prediction."""
+import logging
 import pickle
 
 import lightgbm as lgb
@@ -10,11 +11,6 @@ from sklearn.metrics import r2_score
 from sklearn.model_selection import KFold
 
 from lgbm_base import LGBMMBaseModel
-
-# Pycharm setting
-desired_width = 320
-pd.set_option("display.width", desired_width)
-pd.set_option("display.max_columns", 20)
 
 
 class LGBMModelTrainer(LGBMMBaseModel):
@@ -53,11 +49,6 @@ class LGBMModelTrainer(LGBMMBaseModel):
             valid_sets=watchlist,
             verbose_eval=20000,
         )
-
-        print("R2 score on train:")
-        print(r2_score(y_train, booster.predict(x_train)))
-        print("R2 score on valid")
-        print(r2_score(y_valid, booster.predict(x_valid)))
 
         return booster.best_iteration
 
@@ -115,15 +106,20 @@ class LGBMModelTrainer(LGBMMBaseModel):
         """Pipeline that run everything."""
         self.load_data()
         self.retype_data()
+        logging.info("Starting oof Cross Validation fit.")
         n_trees = self.train_model_CV()
         # Replace number of iteration for final model
         self.params["num_boost_round"] = n_trees
+        logging.info("Starting of final model training.")
         final_model = self.final_model(self.data[self.preds], self.data[self.target])
+        logging.info("Model succesfully trained.")
 
         self.data["predictions"] = final_model.predict(self.data[self.preds])
-        print("R2 score:")
-        print(r2_score(self.data[self.target], self.data["predictions"]))
+        logging.info("R2 score of final model:")
+        logging.info(r2_score(self.data[self.target], self.data["predictions"]))
         self.compute_var_imp(final_model)
 
         # Save model
+        logging.info("Saving of the model.")
         pickle.dump(final_model, open(self.config["path_to_save"], "wb"))
+        logging.info("Model succesfully saved.")
