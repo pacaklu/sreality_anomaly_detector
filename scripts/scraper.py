@@ -5,6 +5,7 @@ from typing import Optional
 
 import pandas as pd
 import requests
+
 from sreality_anomaly_detector.lgbm_inferor import extract_one_flat_details
 from tqdm import tqdm
 
