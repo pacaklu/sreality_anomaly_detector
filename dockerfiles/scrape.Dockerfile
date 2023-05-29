@@ -13,4 +13,4 @@ RUN pip install -r requirements.txt
 COPY ./scripts /sreality_anomaly_detector/scripts
 COPY ./sreality_anomaly_detector /sreality_anomaly_detector/sreality_anomaly_detector
 
-CMD [ "python", "./scripts/scraper.py"]
+CMD [ "python", "-u", "./scripts/scraper.py"]
