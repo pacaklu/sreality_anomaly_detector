@@ -1,13 +1,14 @@
 """Class for scraping of flats from Sreality."""
+import logging
 import math
 from datetime import date
 from typing import Optional
 
 import pandas as pd
 import requests
+from tqdm import tqdm
 
 from sreality_anomaly_detector.lgbm_inferor import extract_one_flat_details
-from tqdm import tqdm
 
 # Available is 20, 40, 60
 SCRAPE_FLATS_PER_PAGE = 60
@@ -81,8 +82,10 @@ class SrealityScraper:
                 list_of_dicts.append(one_flat_details)
 
         dataframe = pd.DataFrame(list_of_dicts)
-        name = f"{str(date.today())}_scrape.csv"
+        logging.info("Creating scraped Dataframe and saving.")
+        name = f"/data/{str(date.today())}_scrape.csv"
         dataframe.to_csv(name, header=True, index=False)
+        logging.info(f"Data saved into {name}.")
 
     def scrape_pipeline(self):
         """One function that wraps all steps."""
