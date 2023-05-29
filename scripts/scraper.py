@@ -89,6 +89,7 @@ class SrealityScraper:
 
     def scrape_pipeline(self):
         """One function that wraps all steps."""
+        logging.info("Starting whole scraping process.")
         self.count_number_of_pages_needed()
         self.obtain_ids_of_all_available_flats()
         self.create_and_save_df_with_data()
