@@ -8,7 +8,7 @@ ENV PYTHONPATH=/sreality_anomaly_detector
 COPY ./requirements/requirements.txt /sreality_anomaly_detector
 
 COPY ./api /sreality_anomaly_detector/api
-COPY ./model /sreality_anomaly_detector/model
+#COPY ./model /sreality_anomaly_detector/model
 COPY ./sreality_anomaly_detector /sreality_anomaly_detector/sreality_anomaly_detector
 
 # install packages
