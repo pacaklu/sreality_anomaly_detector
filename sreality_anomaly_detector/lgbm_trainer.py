@@ -7,10 +7,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
+from configs import training_config
+from lgbm_base import LGBMMBaseModel
 from sklearn.metrics import r2_score
 from sklearn.model_selection import KFold
-
-from lgbm_base import LGBMMBaseModel
 
 
 class LGBMModelTrainer(LGBMMBaseModel):
@@ -56,9 +56,7 @@ class LGBMModelTrainer(LGBMMBaseModel):
         """Compute variable importance."""
         importance_df = pd.DataFrame()
         importance_df["Feature"] = self.preds
-        importance_df["Importance_gain"] = model.feature_importance(
-            importance_type="gain"
-        )
+        importance_df["Importance_gain"] = model.feature_importance(importance_type="gain")
 
         plt.plot(figsize=(15, 15))
         bar = sns.barplot(
@@ -83,11 +81,7 @@ class LGBMModelTrainer(LGBMMBaseModel):
             train_target = self.data[self.target].iloc[train_indexes]
             valid_target = self.data[self.target].iloc[valid_indexes]
 
-            lgbm_rounds.append(
-                self.one_model_lgbm(
-                    train_data_lgbm, valid_data_lgbm, train_target, valid_target
-                )
-            )
+            lgbm_rounds.append(self.one_model_lgbm(train_data_lgbm, valid_data_lgbm, train_target, valid_target))
 
         return int(np.mean(lgbm_rounds))
 
@@ -123,3 +117,8 @@ class LGBMModelTrainer(LGBMMBaseModel):
         logging.info("Saving of the model.")
         pickle.dump(final_model, open(self.config["path_to_save"], "wb"))
         logging.info("Model succesfully saved.")
+
+
+if __name__ == "__main__":
+    model = LGBMModelTrainer(training_config)
+    model.fit_and_predict()
