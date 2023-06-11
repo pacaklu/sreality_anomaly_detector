@@ -50,9 +50,7 @@ class ChartGenerator:
             y=mean_of_price_per_apartment,
             title="Mean price of flat.",
         )
-        self.list_of_html_divs.append(
-            plotly.offline.plot(fig, include_plotlyjs=False, output_type="div")
-        )
+        self.list_of_html_divs.append(plotly.offline.plot(fig, include_plotlyjs=False, output_type="div"))
 
     def create_chart_mean_per_1m(self):
         """Create chart mean of price per apartment."""
@@ -65,9 +63,7 @@ class ChartGenerator:
             y=mean_of_price_per_1m2,
             title="Mean price squared meter.",
         )
-        self.list_of_html_divs.append(
-            plotly.offline.plot(fig, include_plotlyjs=False, output_type="div")
-        )
+        self.list_of_html_divs.append(plotly.offline.plot(fig, include_plotlyjs=False, output_type="div"))
 
 
 if __name__ == "__main__":

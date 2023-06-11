@@ -35,15 +35,13 @@ class SrealityScraper:
         obtained_json = obtained_json.json()
         number_of_available_flats = int(obtained_json["result_size"])
 
-        self.number_of_pages_to_scrap = math.ceil(
-            number_of_available_flats / SCRAPE_FLATS_PER_PAGE
-        )
+        self.number_of_pages_to_scrap = math.ceil(number_of_available_flats / SCRAPE_FLATS_PER_PAGE)
 
     def obtain_ids_of_all_available_flats(self):
         """Collect ids of all available flats."""
         list_of_flat_ids = []
         for page_number in tqdm(range(self.number_of_pages_to_scrap)):
-        #for page_number in tqdm(range(10)):
+            # for page_number in tqdm(range(10)):
             url = (
                 f"https://www.sreality.cz/api/cs/v2/estates?category_sub_cb=4|5&category_main_cb=1&"
                 f"locality_region_id=10&category_type_cb=1&per_page={SCRAPE_FLATS_PER_PAGE}&page={page_number}"
@@ -51,9 +49,9 @@ class SrealityScraper:
             obtained_json = requests.get(url=url)
             obtained_json = obtained_json.json()
             for index in range(SCRAPE_FLATS_PER_PAGE):
-                flat_id = obtained_json["_embedded"]["estates"][index]["_embedded"][
-                    "favourite"
-                ]["_links"]["self"]["href"]
+                flat_id = obtained_json["_embedded"]["estates"][index]["_embedded"]["favourite"]["_links"]["self"][
+                    "href"
+                ]
                 # flat_id is in format /cs/v2/favourite/ID
                 flat_id = flat_id.split("/")[-1]
                 list_of_flat_ids.append(flat_id)
