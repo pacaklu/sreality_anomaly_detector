@@ -1,0 +1,1 @@
+# Init file of folder for mounting of models.
