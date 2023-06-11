@@ -66,6 +66,8 @@ class LGBMModelTrainer(LGBMMBaseModel):
         )
         fig = bar.get_figure()
         fig.savefig(self.config["path_to_save"] + "variable_importance.png")
+        logging.info("Variable importance of the features in the model:")
+        logging.info(importance_df.to_string())
 
     def train_model_CV(self):
         """Train cross-validation model. Used for obtaining of how many trees should model have."""
@@ -83,6 +85,7 @@ class LGBMModelTrainer(LGBMMBaseModel):
 
             lgbm_rounds.append(self.one_model_lgbm(train_data_lgbm, valid_data_lgbm, train_target, valid_target))
 
+        logging.info(f"Optimal number of trees: {int(np.mean(lgbm_rounds))}")
         return int(np.mean(lgbm_rounds))
 
     def final_model(self, data, target):
@@ -120,6 +123,10 @@ class LGBMModelTrainer(LGBMMBaseModel):
 
 
 if __name__ == "__main__":
-    logging.basicConfig(filename=training_config["path_to_save"] + "logfilename.log", level=logging.INFO)
+    logging.basicConfig(
+        filename=training_config["path_to_save"] + "logfilename.log",
+        level=logging.INFO,
+        format="%(asctime)s : %(levelname)s : %(message)s",
+    )
     model = LGBMModelTrainer(training_config)
     model.fit_and_predict()

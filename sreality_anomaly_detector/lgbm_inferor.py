@@ -91,12 +91,8 @@ def extract_one_flat_details(obtained_json: dict) -> Optional[dict]:
             if poi["name"] == "Restaurace":
                 dict_of_info["restaurant_distance"] = poi["walkDistance"]
 
-        dict_of_info["closest_transport_distance"] = obtained_json["poi_transport"][
-            "values"
-        ][0]["distance"]
-        dict_of_info["closest_shop_distance"] = obtained_json["poi_grocery"]["values"][
-            0
-        ]["distance"]
+        dict_of_info["closest_transport_distance"] = obtained_json["poi_transport"]["values"][0]["distance"]
+        dict_of_info["closest_shop_distance"] = obtained_json["poi_grocery"]["values"][0]["distance"]
     dict_of_info["distance_to_centre"] = distance_from_centre(obtained_json)
 
     return dict_of_info
@@ -130,7 +126,6 @@ class LGBMModelInferor(LGBMMBaseModel):
         url = f"https://www.sreality.cz/api/cs/v2/estates/{input_flat_id}"
         obtained_json = requests.get(url=url).json()
         return obtained_json
-
 
     @staticmethod
     def reconstruct_url_from_id(flat_id):
