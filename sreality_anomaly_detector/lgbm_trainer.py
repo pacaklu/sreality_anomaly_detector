@@ -65,7 +65,7 @@ class LGBMModelTrainer(LGBMMBaseModel):
             data=importance_df.sort_values(by="Importance_gain", ascending=False),
         )
         fig = bar.get_figure()
-        fig.savefig("variable_importance.png")
+        fig.savefig(self.config["path_to_save"] + "variable_importance.png")
 
     def train_model_CV(self):
         """Train cross-validation model. Used for obtaining of how many trees should model have."""
@@ -115,10 +115,11 @@ class LGBMModelTrainer(LGBMMBaseModel):
 
         # Save model
         logging.info("Saving of the model.")
-        pickle.dump(final_model, open(self.config["path_to_save"], "wb"))
+        pickle.dump(final_model, open(self.config["path_to_save"] + "lgbm_model.pickle", "wb"))
         logging.info("Model succesfully saved.")
 
 
 if __name__ == "__main__":
+    logging.basicConfig(filename=training_config["path_to_save"] + "logfilename.log", level=logging.INFO)
     model = LGBMModelTrainer(training_config)
     model.fit_and_predict()
