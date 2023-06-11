@@ -12,4 +12,4 @@ RUN pip install -r requirements.txt
 # Copy files
 COPY ./sreality_anomaly_detector /sreality_anomaly_detector/sreality_anomaly_detector
 
-CMD [ "python", "-u", "./sreality_anomaly_detector/lgbm_training_pipeline.py"]
+CMD [ "python", "-u", "./sreality_anomaly_detector/lgbm_trainer.py"]
