@@ -9,6 +9,8 @@ import requests
 from tqdm import tqdm
 
 from sreality_anomaly_detector.lgbm_inferor import extract_one_flat_details
+from sreality_anomaly_detector.configs import scrape_config
+
 
 # Available is 20, 40, 60
 SCRAPE_FLATS_PER_PAGE = 60
@@ -19,6 +21,7 @@ class SrealityScraper:
 
     def __init__(self):
         """Initialize of parameters."""
+        self.confg = scrape_config
         self.number_of_pages_to_scrap = None
         self.list_of_flat_ids = None
 
@@ -80,9 +83,8 @@ class SrealityScraper:
 
         dataframe = pd.DataFrame(list_of_dicts)
         logging.info("Creating scraped Dataframe and saving.")
-        name = f"/data/scrape.csv"
-        dataframe.to_csv(name, header=True, index=False)
-        logging.info(f"Data saved into {name}.")
+        dataframe.to_csv(self.config["data_path"], header=True, index=False)
+        logging.info(f"Data saved into {self.config['data_path']}.")
 
     def scrape_pipeline(self):
         """One function that wraps all steps."""

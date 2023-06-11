@@ -124,7 +124,7 @@ class LGBMModelTrainer(LGBMMBaseModel):
 
 if __name__ == "__main__":
     logging.basicConfig(
-        filename=training_config["path_to_save"] + "logfilename.log",
+        filename=training_config["path_to_save"] + "model_training.log",
         level=logging.INFO,
         format="%(asctime)s : %(levelname)s : %(message)s",
     )
