@@ -7,16 +7,10 @@ import pandas as pd
 
 sys.path.append(r"C:\Users\pacak\PycharmProjects\sreality_anomaly_detector")
 
-from sreality_anomaly_detector.lgbm_inferor import (LGBMModelInferor,
-                                            distance_from_centre,
-                                            extract_one_flat_details)
+from sreality_anomaly_detector.lgbm_inferor import LGBMModelInferor, distance_from_centre, extract_one_flat_details
 
-model_config = {
-    "model_path": r"C:\Users\pacak\PycharmProjects\sreality_detector\model\lgbm_model.pickle"
-}
-TESTING_JSON_PATH = (
-    r"C:\Users\pacak\PycharmProjects\sreality_detector\tests\testing_flat_data.json"
-)
+model_config = {"model_path": r"C:\Users\pacak\PycharmProjects\sreality_detector\model\lgbm_model.pickle"}
+TESTING_JSON_PATH = r"C:\Users\pacak\PycharmProjects\sreality_detector\tests\testing_flat_data.json"
 
 
 def test_distance_from_centre():
@@ -82,13 +76,15 @@ def test_constructor():
     ]
     pd.testing.assert_frame_equal(model.data, pd.DataFrame())
 
+
 def test_request_flat_data():
     """Test whether request for flat returns proper results."""
     model = LGBMModelInferor(model_config)
     flat_id_to_test = 4065768524
     obtained_json = model._request_flat_data(flat_id_to_test)
-    assert len(obtained_json) >0
+    assert len(obtained_json) > 0
     assert type(obtained_json) == dict
+
 
 def test_load_model():
     """Test _load method."""
