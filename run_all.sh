@@ -17,3 +17,7 @@ docker run -v /home/ec2-user/data/:/data/ prediction_image
 
 # STOP ALL
 docker stop $(docker ps -a -q)
+
+
+
+

@@ -82,6 +82,7 @@ class SrealityScraper:
                 list_of_dicts.append(one_flat_details)
 
         dataframe = pd.DataFrame(list_of_dicts)
+        dataframe['ID'] = self.list_of_flat_ids
         logging.info("Creating scraped Dataframe and saving.")
         dataframe.to_csv(self.config["data_path"], header=True, index=False)
         logging.info(f"Data saved into {self.config['data_path']}.")

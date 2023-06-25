@@ -76,8 +76,6 @@ def extract_one_flat_details(obtained_json: dict) -> Optional[dict]:
             dict_of_info["barrierless"] = item["value"]
         if item["name"] == "Vybavení":
             dict_of_info["equipped"] = item["value"]
-        if item["name"] == "ID":
-            dict_of_info["ID"] = item["value"]
         if item["name"] == "Lodžie":
             dict_of_info["balcony"] = True
         if item["name"] == "Terase":
