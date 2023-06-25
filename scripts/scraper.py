@@ -19,9 +19,9 @@ SCRAPE_FLATS_PER_PAGE = 60
 class SrealityScraper:
     """Main class for scraping."""
 
-    def __init__(self):
+    def __init__(self, scrape_config):
         """Initialize of parameters."""
-        self.confg = scrape_config
+        self.config = scrape_config
         self.number_of_pages_to_scrap = None
         self.list_of_flat_ids = None
 
@@ -95,5 +95,5 @@ class SrealityScraper:
 
 
 if __name__ == "__main__":
-    scraper = SrealityScraper()
+    scraper = SrealityScraper(scrape_config)
     scraper.scrape_pipeline()

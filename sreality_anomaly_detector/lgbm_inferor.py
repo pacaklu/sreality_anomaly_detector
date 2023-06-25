@@ -12,8 +12,12 @@ from sreality_anomaly_detector.lgbm_base import LGBMMBaseModel
 
 # Coordinates of prague city centre
 CENTRE_COORD = (50.082164, 14.426307)
-
-
+def _try_poi_compute(poi: dict) -> float:
+    """Try to compute walkdistance to given poi."""
+    try:
+        return poi["walkDistance"]
+    except KeyError:
+        return np.NaN
 def extract_one_flat_details(obtained_json: dict) -> Optional[dict]:
     """Extract flat details from the dictionary."""
     # Check if "price_czk" not in keys of received json
@@ -86,11 +90,11 @@ def extract_one_flat_details(obtained_json: dict) -> Optional[dict]:
     if "poi" in obtained_json.keys():
         for poi in obtained_json["poi"]:
             if poi["name"] == "Vlak":
-                dict_of_info["train_distance"] = poi["walkDistance"]
+                dict_of_info["train_distance"] = _try_poi_compute(poi)
             if poi["name"] == "Metro":
-                dict_of_info["metro_distance"] = poi["walkDistance"]
+                dict_of_info["metro_distance"] = _try_poi_compute(poi)
             if poi["name"] == "Restaurace":
-                dict_of_info["restaurant_distance"] = poi["walkDistance"]
+                dict_of_info["restaurant_distance"] = _try_poi_compute(poi)
 
         try:
             dict_of_info["closest_transport_distance"] = obtained_json["poi_transport"]["values"][0]["distance"]
@@ -104,7 +108,6 @@ def extract_one_flat_details(obtained_json: dict) -> Optional[dict]:
     dict_of_info["distance_to_centre"] = distance_from_centre(obtained_json)
 
     return dict_of_info
-
 
 def distance_from_centre(obtained_json: dict) -> float:
     """Compute distance from Prague's city centre to actual flat."""
