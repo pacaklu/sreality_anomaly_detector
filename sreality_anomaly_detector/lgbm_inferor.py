@@ -4,6 +4,7 @@ import pickle
 from typing import Optional
 
 import geopy.distance
+import numpy as np
 import pandas as pd
 import requests
 
@@ -91,8 +92,15 @@ def extract_one_flat_details(obtained_json: dict) -> Optional[dict]:
             if poi["name"] == "Restaurace":
                 dict_of_info["restaurant_distance"] = poi["walkDistance"]
 
-        dict_of_info["closest_transport_distance"] = obtained_json["poi_transport"]["values"][0]["distance"]
-        dict_of_info["closest_shop_distance"] = obtained_json["poi_grocery"]["values"][0]["distance"]
+        try:
+            dict_of_info["closest_transport_distance"] = obtained_json["poi_transport"]["values"][0]["distance"]
+        except KeyError:
+            dict_of_info["closest_transport_distance"] = np.NaN
+        try:
+            dict_of_info["closest_shop_distance"] = obtained_json["poi_grocery"]["values"][0]["distance"]
+        except KeyError:
+            dict_of_info["closest_shop_distance"] = np.NaN
+
     dict_of_info["distance_to_centre"] = distance_from_centre(obtained_json)
 
     return dict_of_info
