@@ -13,7 +13,7 @@ docker run -v /home/ec2-user/models/:/models -d -p 8000:8000 api
 #curl -X POST http://localhost:8000/predict?input_data=4065768524
 
 # docker build -f dockerfiles/predict.Dockerfile . -t prediction_image
-docker run -v /home/ec2-user/data/:/data/ prediction_image
+docker run -v /home/ec2-user/data/:/data/ --network host prediction_image
 
 # STOP ALL
 docker stop $(docker ps -a -q)
