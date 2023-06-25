@@ -12,4 +12,5 @@ if __name__ == "__main__":
     for flat_id in flat_ids_to_test:
         API_ENDPOINT = prediction_config["api_url"] + str(flat_id)
         r = requests.post(url=API_ENDPOINT)
-        logging.INFO(f'prediction for {flat_id} is {r.json()}')
+        logging.info(r.json())
+        #logging.INFO(f'prediction for {flat_id} is {r.json()}')
