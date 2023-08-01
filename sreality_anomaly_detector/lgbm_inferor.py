@@ -148,10 +148,9 @@ class LGBMModelInferor(LGBMMBaseModel):
 
         preprocessed_data = extract_one_flat_details(obtained_json)
         self.data = pd.DataFrame(preprocessed_data, index=[0])
-        self.retype_data()
-        logging.info("Data successfully preprocessed")
-
         try:
+            self.retype_data()
+            logging.info("Data successfully preprocessed")
             prediction = self.model.predict(self.data[self.preds])
             prediction_minus_actual = prediction[0] - self.data["price"][0]
         except:

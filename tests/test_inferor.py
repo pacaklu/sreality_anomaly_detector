@@ -4,6 +4,7 @@ import json
 import sys
 
 import pandas as pd
+import math
 
 sys.path.append(r"C:\Users\pacak\PycharmProjects\sreality_anomaly_detector")
 
@@ -102,3 +103,11 @@ def test_predict():
     result = model.predict(flat_id_to_test)
     assert result["flat_id"] == flat_id_to_test
     assert abs(result["prediction_minus_actual_price"]) > 0
+
+def test_predict_nonexistingid():
+    """Test predict method of LGBMModelInferor class."""
+    model = LGBMModelInferor(model_config)
+    flat_id_to_test = 999784894406576120124154512218524
+    result = model.predict(flat_id_to_test)
+    assert result["flat_id"] == flat_id_to_test
+    assert math.isnan(result["prediction_minus_actual_price"])
