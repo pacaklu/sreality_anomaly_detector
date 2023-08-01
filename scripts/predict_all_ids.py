@@ -1,6 +1,7 @@
 import json
 import pandas as pd
 import requests
+import logging
 
 from sreality_anomaly_detector.configs import prediction_config
 from scripts.email_sender import send_mail
@@ -27,8 +28,11 @@ if __name__ == "__main__":
     urls = []
 
     for flat_id in flat_ids_to_test:
+        logging.warning(flat_id)
         API_ENDPOINT = prediction_config["api_url"] + str(flat_id)
         r = requests.post(url=API_ENDPOINT)
+        logging.warning(r)
+        logging.warning(r.json)
         predictions.append(r.json()['prediction_minus_actual_price'])
         urls.append(reconstruct_url_from_id(flat_id))
 
