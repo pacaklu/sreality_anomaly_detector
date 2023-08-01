@@ -136,21 +136,6 @@ class LGBMModelInferor(LGBMMBaseModel):
         obtained_json = requests.get(url=url).json()
         return obtained_json
 
-    @staticmethod
-    def reconstruct_url_from_id(flat_id):
-        """Reconstruct url from if of apartment to be easily visualise."""
-        url = f"https://www.sreality.cz/api/cs/v2/estates/{flat_id}"
-        obtained_json = requests.get(url=url)
-        obtained_json = obtained_json.json()
-        flat_locality = obtained_json["seo"]["locality"]
-        if "2+1" in obtained_json["name"]["value"]:
-            proportion = "2+1"
-        else:
-            proportion = "2+kk"
-
-        url_obtained = f"https://www.sreality.cz/detail/prodej/byt/{proportion}/{flat_locality}/{flat_id}"
-        return url_obtained
-
     def predict(self, input_flat_id):
         """Predict price of the flat."""
         logging.info("Loading Model")
@@ -171,4 +156,4 @@ class LGBMModelInferor(LGBMMBaseModel):
         except:
             prediction = float("nan")
 
-        return {"flat_id": input_flat_id, "prediction": prediction[0]}
+        return {"flat_id": input_flat_id, "prediction_minus_actual_price": prediction[0] - self.data["price"]}
