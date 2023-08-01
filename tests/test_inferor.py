@@ -101,4 +101,4 @@ def test_predict():
     flat_id_to_test = 4065768524
     result = model.predict(flat_id_to_test)
     assert result["flat_id"] == flat_id_to_test
-    assert result["prediction"] > 0
+    assert abs(result["prediction_minus_actual_price"]) > 0
