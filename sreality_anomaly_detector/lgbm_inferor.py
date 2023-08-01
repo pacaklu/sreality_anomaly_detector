@@ -153,7 +153,7 @@ class LGBMModelInferor(LGBMMBaseModel):
 
         try:
             prediction = self.model.predict(self.data[self.preds])
-            prediction_minus_actual = prediction - self.data["price"][0]
+            prediction_minus_actual = prediction[0] - self.data["price"][0]
         except:
             prediction_minus_actual = float("nan")
 
