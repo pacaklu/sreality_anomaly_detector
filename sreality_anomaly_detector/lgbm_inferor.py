@@ -138,19 +138,19 @@ class LGBMModelInferor(LGBMMBaseModel):
 
     def predict(self, input_flat_id):
         """Predict price of the flat."""
-        logging.info("Loading Model")
+        logging.warning("Loading Model")
         self._load_model()
-        logging.info("Model successfully loaded")
+        logging.warning("Model successfully loaded")
 
-        logging.info("Trying to request data from Sreality API")
+        logging.warning("Trying to request data from Sreality API")
         obtained_json = self._request_flat_data(input_flat_id)
-        logging.info("Data successfully requested")
+        logging.warning("Data successfully requested")
 
         preprocessed_data = extract_one_flat_details(obtained_json)
         self.data = pd.DataFrame(preprocessed_data, index=[0])
         try:
             self.retype_data()
-            logging.info("Data successfully preprocessed")
+            logging.warning("Data successfully preprocessed")
             prediction = self.model.predict(self.data[self.preds])
             prediction_minus_actual = prediction[0] - self.data["price"][0]
         except:

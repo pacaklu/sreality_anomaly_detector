@@ -28,12 +28,13 @@ if __name__ == "__main__":
     urls = []
 
     for flat_id in flat_ids_to_test:
-        logging.warning(flat_id)
+
+        logging.warning(f'Making prediction for flat id {flat_id}')
         API_ENDPOINT = prediction_config["api_url"] + str(flat_id)
         r = requests.post(url=API_ENDPOINT)
-        logging.warning(r)
-        logging.warning(r.json)
-        predictions.append(r.json()['prediction_minus_actual_price'])
+        extracted_data = r.json()
+
+        predictions.append(extracted_data['prediction_minus_actual_price'])
         urls.append(reconstruct_url_from_id(flat_id))
 
     final_data = pd.DataFrame([flat_ids_to_test, predictions, urls], columns=['flat_id', 'prediction_minus_actual', 'url'])
