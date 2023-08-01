@@ -149,7 +149,7 @@ class LGBMModelInferor(LGBMMBaseModel):
 
             preprocessed_data = extract_one_flat_details(obtained_json)
             self.data = pd.DataFrame(preprocessed_data, index=[0])
-            
+
             self.retype_data()
             logging.warning("Data successfully preprocessed")
             prediction = self.model.predict(self.data[self.preds])

@@ -32,10 +32,15 @@ if __name__ == "__main__":
         logging.warning(f'Making prediction for flat id {flat_id}')
         API_ENDPOINT = prediction_config["api_url"] + str(flat_id)
         r = requests.post(url=API_ENDPOINT)
-        extracted_data = r.json()
+        try:
+            extracted_data = r.json()
 
-        predictions.append(extracted_data['prediction_minus_actual_price'])
-        urls.append(reconstruct_url_from_id(flat_id))
+            predictions.append(extracted_data['prediction_minus_actual_price'])
+            urls.append(reconstruct_url_from_id(flat_id))
+            logging.warning(f'ID predicted succesfully')
+        except:
+            logging.warning(f'Error while predicting of the price.')
+
 
     final_data = pd.DataFrame([flat_ids_to_test, predictions, urls], columns=['flat_id', 'prediction_minus_actual', 'url'])
     final_data = final_data.sort_values(by = 'prediction_minus_actual', ascending = False).head(15)
