@@ -36,6 +36,10 @@ if __name__ == "__main__":
         try:
             extracted_data = r.json()
 
+            logging.warning(extracted_data['prediction_minus_actual_price'])
+            logging.warning(reconstruct_url_from_id(flat_id))
+
+
             flat_ids.append(flat_id)
             predictions.append(extracted_data['prediction_minus_actual_price'])
             urls.append(reconstruct_url_from_id(flat_id))
