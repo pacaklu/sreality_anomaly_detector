@@ -65,23 +65,28 @@ class SrealityScraper:
     def request_one_flat(flat_id: str) -> Optional[dict]:
         """Request API with 1 flat id and return response."""
         url = f"https://www.sreality.cz/api/cs/v2/estates/{flat_id}"
-        obtained_json = requests.get(url=url, timeout =5)
-        obtained_json = obtained_json.json()
+        try:
+            obtained_json = requests.get(url=url, timeout =5)
+            obtained_json = obtained_json.json()
+        except:
+            return {}
 
         return obtained_json
 
     def create_and_save_df_with_data(self):
         """Create and save dataframe with all scraped flats."""
         list_of_dicts = []
+        list_of_valid_flat_ids = []
         for flat_id in tqdm(self.list_of_flat_ids):
             flat_api_response = self.request_one_flat(flat_id)
             one_flat_details = extract_one_flat_details(flat_api_response)
 
             if one_flat_details:
                 list_of_dicts.append(one_flat_details)
+                list_of_valid_flat_ids.append(flat_id)
 
         dataframe = pd.DataFrame(list_of_dicts)
-        dataframe['ID'] = self.list_of_flat_ids
+        dataframe['ID'] = list_of_valid_flat_ids
         logging.info("Creating scraped Dataframe and saving.")
         dataframe.to_csv(self.config["data_path"], header=True, index=False)
         logging.info(f"Data saved into {self.config['data_path']}.")
