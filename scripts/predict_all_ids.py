@@ -43,10 +43,7 @@ if __name__ == "__main__":
         except:
             logging.warning(f'Error while predicting of the price.')
 
-    logging.warning(flat_ids)
-    logging.warning(predictions)
-    logging.warning(urls)
-    final_data = pd.DataFrame([flat_ids, predictions, urls], columns=['flat_id', 'prediction_minus_actual', 'url'])
+    final_data = pd.DataFrame({'flat_id': flat_ids, 'prediction_minus_actual': predictions, 'url': urls})
     final_data = final_data.sort_values(by = 'prediction_minus_actual', ascending = False).head(15)
     final_data.to_csv(prediction_config["data_path"], header = True, index = False)
     send_mail(prediction_config["data_path"])
