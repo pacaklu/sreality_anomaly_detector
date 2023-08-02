@@ -36,10 +36,6 @@ if __name__ == "__main__":
         try:
             extracted_data = r.json()
 
-            logging.warning(extracted_data['prediction_minus_actual_price'])
-            logging.warning(reconstruct_url_from_id(flat_id))
-
-
             flat_ids.append(flat_id)
             predictions.append(extracted_data['prediction_minus_actual_price'])
             urls.append(reconstruct_url_from_id(flat_id))
@@ -47,7 +43,9 @@ if __name__ == "__main__":
         except:
             logging.warning(f'Error while predicting of the price.')
 
-
+    logging.warning(flat_ids)
+    logging.warning(predictions)
+    logging.warning(urls)
     final_data = pd.DataFrame([flat_ids, predictions, urls], columns=['flat_id', 'prediction_minus_actual', 'url'])
     final_data = final_data.sort_values(by = 'prediction_minus_actual', ascending = False).head(15)
     final_data.to_csv(prediction_config["data_path"], header = True, index = False)
