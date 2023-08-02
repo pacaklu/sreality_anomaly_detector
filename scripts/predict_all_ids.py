@@ -31,9 +31,9 @@ if __name__ == "__main__":
     for flat_id in flat_ids_to_test:
 
         logging.warning(f'Making prediction for flat id {flat_id}')
-        API_ENDPOINT = prediction_config["api_url"] + str(flat_id)
-        r = requests.post(url=API_ENDPOINT)
+        api_url = prediction_config["api_url"] + str(flat_id)
         try:
+            r = requests.post(url=api_url)
             extracted_data = r.json()
 
             flat_ids.append(flat_id)
