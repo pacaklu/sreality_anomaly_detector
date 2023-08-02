@@ -1,4 +1,4 @@
-FROM python:3.11
+FROM python:3.8
 
 # Set working directory
 WORKDIR /sreality_anomaly_detector
