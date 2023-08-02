@@ -65,7 +65,7 @@ class SrealityScraper:
     def request_one_flat(flat_id: str) -> Optional[dict]:
         """Request API with 1 flat id and return response."""
         url = f"https://www.sreality.cz/api/cs/v2/estates/{flat_id}"
-        obtained_json = requests.get(url=url)
+        obtained_json = requests.get(url=url, timeout =5)
         obtained_json = obtained_json.json()
 
         return obtained_json
