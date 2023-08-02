@@ -33,7 +33,7 @@ if __name__ == "__main__":
         logging.warning(f'Making prediction for flat id {flat_id}')
         api_url = prediction_config["api_url"] + str(flat_id)
         try:
-            r = requests.post(url=api_url)
+            r = requests.post(url=api_url, timeout = 5)
             extracted_data = r.json()
 
             flat_ids.append(flat_id)
