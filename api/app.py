@@ -1,6 +1,5 @@
 """API for LGBMINFEROR class."""
 from fastapi import FastAPI
-
 from sreality_anomaly_detector.configs import inference_model_config
 from sreality_anomaly_detector.lgbm_inferor import LGBMModelInferor
 

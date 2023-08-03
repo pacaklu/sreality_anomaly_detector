@@ -7,10 +7,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
-from configs import training_config
-from lgbm_base import LGBMMBaseModel
 from sklearn.metrics import r2_score
 from sklearn.model_selection import KFold
+
+from configs import training_config
+from lgbm_base import LGBMMBaseModel
 
 
 class LGBMModelTrainer(LGBMMBaseModel):
@@ -38,7 +39,13 @@ class LGBMModelTrainer(LGBMMBaseModel):
         """Load the data."""
         self.data = pd.read_csv(self.config["input_path"])
 
-    def one_model_lgbm(self, x_train, x_valid, y_train, y_valid):
+    def one_model_lgbm(
+        self,
+        x_train: pd.DataFrame,
+        x_valid: pd.DataFrame,
+        y_train: pd.Series,
+        y_valid: pd.Series,
+    ):
         """Fit one LGBM model."""
         dtrain = lgb.Dataset(x_train, label=y_train)
         dvalid = lgb.Dataset(x_valid, label=y_valid)
@@ -52,11 +59,13 @@ class LGBMModelTrainer(LGBMMBaseModel):
 
         return booster.best_iteration
 
-    def compute_var_imp(self, model):
+    def compute_var_imp(self, model: lgb.booster):
         """Compute variable importance."""
         importance_df = pd.DataFrame()
         importance_df["Feature"] = self.preds
-        importance_df["Importance_gain"] = model.feature_importance(importance_type="gain")
+        importance_df["Importance_gain"] = model.feature_importance(
+            importance_type="gain"
+        )
 
         plt.plot(figsize=(15, 15))
         bar = sns.barplot(
@@ -70,7 +79,7 @@ class LGBMModelTrainer(LGBMMBaseModel):
         logging.info(importance_df.to_string())
 
     def train_model_CV(self):
-        """Train cross-validation model. Used for obtaining of how many trees should model have."""
+        """Train cross-validation model. Obtain how many trees should model have."""
         lgbm_rounds = []
 
         n_splits = 4
@@ -83,12 +92,16 @@ class LGBMModelTrainer(LGBMMBaseModel):
             train_target = self.data[self.target].iloc[train_indexes]
             valid_target = self.data[self.target].iloc[valid_indexes]
 
-            lgbm_rounds.append(self.one_model_lgbm(train_data_lgbm, valid_data_lgbm, train_target, valid_target))
+            lgbm_rounds.append(
+                self.one_model_lgbm(
+                    train_data_lgbm, valid_data_lgbm, train_target, valid_target
+                )
+            )
 
         logging.info(f"Optimal number of trees: {int(np.mean(lgbm_rounds))}")
         return int(np.mean(lgbm_rounds))
 
-    def final_model(self, data, target):
+    def final_model(self, data: pd.DataFrame, target: pd.Series):
         """Fit final model with number of trees estimated from CV."""
         dtrain = lgb.Dataset(data, label=target)
         dvalid = lgb.Dataset(data, label=target)
@@ -118,7 +131,9 @@ class LGBMModelTrainer(LGBMMBaseModel):
 
         # Save model
         logging.info("Saving of the model.")
-        pickle.dump(final_model, open(self.config["path_to_save"] + "lgbm_model.pickle", "wb"))
+        pickle.dump(
+            final_model, open(self.config["path_to_save"] + "lgbm_model.pickle", "wb")
+        )
         logging.info("Model succesfully saved.")
 
 

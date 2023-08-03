@@ -1,16 +1,13 @@
 """Class for scraping of flats from Sreality."""
 import logging
 import math
-from datetime import date
 from typing import Optional
 
 import pandas as pd
 import requests
-from tqdm import tqdm
-
-from sreality_anomaly_detector.lgbm_inferor import extract_one_flat_details
 from sreality_anomaly_detector.configs import scrape_config
-
+from sreality_anomaly_detector.lgbm_inferor import extract_one_flat_details
+from tqdm import tqdm
 
 # Available is 20, 40, 60
 SCRAPE_FLATS_PER_PAGE = 60
@@ -19,7 +16,7 @@ SCRAPE_FLATS_PER_PAGE = 60
 class SrealityScraper:
     """Main class for scraping."""
 
-    def __init__(self, scrape_config):
+    def __init__(self, scrape_config: dict):
         """Initialize of parameters."""
         self.config = scrape_config
         self.number_of_pages_to_scrap = None
@@ -38,22 +35,26 @@ class SrealityScraper:
         obtained_json = obtained_json.json()
         number_of_available_flats = int(obtained_json["result_size"])
 
-        self.number_of_pages_to_scrap = math.ceil(number_of_available_flats / SCRAPE_FLATS_PER_PAGE)
+        self.number_of_pages_to_scrap = math.ceil(
+            number_of_available_flats / SCRAPE_FLATS_PER_PAGE
+        )
 
     def obtain_ids_of_all_available_flats(self):
         """Collect ids of all available flats."""
         list_of_flat_ids = []
         for page_number in tqdm(range(self.number_of_pages_to_scrap)):
             url = (
-                f"https://www.sreality.cz/api/cs/v2/estates?category_sub_cb=4|5&category_main_cb=1&"
-                f"locality_region_id=10&category_type_cb=1&per_page={SCRAPE_FLATS_PER_PAGE}&page={page_number}"
+                f"https://www.sreality.cz/api/cs/v2/"
+                f"estates?category_sub_cb=4|5&category_main_cb=1&"
+                f"locality_region_id=10&category_type_cb=1&per_page="
+                f"{SCRAPE_FLATS_PER_PAGE}&page={page_number}"
             )
             obtained_json = requests.get(url=url)
             obtained_json = obtained_json.json()
             for index in range(SCRAPE_FLATS_PER_PAGE):
-                flat_id = obtained_json["_embedded"]["estates"][index]["_embedded"]["favourite"]["_links"]["self"][
-                    "href"
-                ]
+                flat_id = obtained_json["_embedded"]["estates"][index]["_embedded"][
+                    "favourite"
+                ]["_links"]["self"]["href"]
                 # flat_id is in format /cs/v2/favourite/ID
                 flat_id = flat_id.split("/")[-1]
                 list_of_flat_ids.append(flat_id)
@@ -66,7 +67,7 @@ class SrealityScraper:
         """Request API with 1 flat id and return response."""
         url = f"https://www.sreality.cz/api/cs/v2/estates/{flat_id}"
         try:
-            obtained_json = requests.get(url=url, timeout =5)
+            obtained_json = requests.get(url=url, timeout=5)
             obtained_json = obtained_json.json()
         except:
             return {}
@@ -86,7 +87,7 @@ class SrealityScraper:
                 list_of_valid_flat_ids.append(flat_id)
 
         dataframe = pd.DataFrame(list_of_dicts)
-        dataframe['ID'] = list_of_valid_flat_ids
+        dataframe["ID"] = list_of_valid_flat_ids
         logging.info("Creating scraped Dataframe and saving.")
         dataframe.to_csv(self.config["data_path"], header=True, index=False)
         logging.info(f"Data saved into {self.config['data_path']}.")

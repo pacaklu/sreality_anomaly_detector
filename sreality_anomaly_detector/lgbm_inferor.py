@@ -12,12 +12,16 @@ from sreality_anomaly_detector.lgbm_base import LGBMMBaseModel
 
 # Coordinates of prague city centre
 CENTRE_COORD = (50.082164, 14.426307)
+
+
 def _try_poi_compute(poi: dict) -> float:
     """Try to compute walkdistance to given poi."""
     try:
         return poi["walkDistance"]
     except KeyError:
         return np.NaN
+
+
 def extract_one_flat_details(obtained_json: dict) -> Optional[dict]:
     """Extract flat details from the dictionary."""
     # Check if "price_czk" not in keys of received json
@@ -95,17 +99,22 @@ def extract_one_flat_details(obtained_json: dict) -> Optional[dict]:
                 dict_of_info["restaurant_distance"] = _try_poi_compute(poi)
 
         try:
-            dict_of_info["closest_transport_distance"] = obtained_json["poi_transport"]["values"][0]["distance"]
+            dict_of_info["closest_transport_distance"] = obtained_json["poi_transport"][
+                "values"
+            ][0]["distance"]
         except KeyError:
             dict_of_info["closest_transport_distance"] = np.NaN
         try:
-            dict_of_info["closest_shop_distance"] = obtained_json["poi_grocery"]["values"][0]["distance"]
+            dict_of_info["closest_shop_distance"] = obtained_json["poi_grocery"][
+                "values"
+            ][0]["distance"]
         except KeyError:
             dict_of_info["closest_shop_distance"] = np.NaN
 
     dict_of_info["distance_to_centre"] = distance_from_centre(obtained_json)
 
     return dict_of_info
+
 
 def distance_from_centre(obtained_json: dict) -> float:
     """Compute distance from Prague's city centre to actual flat."""
@@ -136,25 +145,28 @@ class LGBMModelInferor(LGBMMBaseModel):
         obtained_json = requests.get(url=url).json()
         return obtained_json
 
-    def predict(self, input_flat_id):
+    def predict(self, input_flat_id: int):
         """Predict price of the flat."""
         try:
-            logging.warning("Loading Model")
+            logging.info("Loading Model")
             self._load_model()
-            logging.warning("Model successfully loaded")
+            logging.info("Model successfully loaded")
 
-            logging.warning("Trying to request data from Sreality API")
+            logging.info("Trying to request data from Sreality API")
             obtained_json = self._request_flat_data(input_flat_id)
-            logging.warning("Data successfully requested")
+            logging.info("Data successfully requested")
 
             preprocessed_data = extract_one_flat_details(obtained_json)
             self.data = pd.DataFrame(preprocessed_data, index=[0])
 
             self.retype_data()
-            logging.warning("Data successfully preprocessed")
+            logging.info("Data successfully preprocessed")
             prediction = self.model.predict(self.data[self.preds])
             prediction_minus_actual = prediction[0] - self.data["price"][0]
         except:
             prediction_minus_actual = float("nan")
 
-        return {"flat_id": input_flat_id, "prediction_minus_actual_price": prediction_minus_actual}
+        return {
+            "flat_id": input_flat_id,
+            "prediction_minus_actual_price": prediction_minus_actual,
+        }

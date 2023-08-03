@@ -1,17 +1,24 @@
 """Tests for Training and inference classes."""
-# Put home directory to the output path
 import json
+import math
 import sys
 
 import pandas as pd
-import math
 
 sys.path.append(r"C:\Users\pacak\PycharmProjects\sreality_anomaly_detector")
 
-from sreality_anomaly_detector.lgbm_inferor import LGBMModelInferor, distance_from_centre, extract_one_flat_details
+from sreality_anomaly_detector.lgbm_inferor import (
+    LGBMModelInferor,
+    distance_from_centre,
+    extract_one_flat_details,
+)
 
-model_config = {"model_path": r"C:\Users\pacak\PycharmProjects\sreality_detector\model\lgbm_model.pickle"}
-TESTING_JSON_PATH = r"C:\Users\pacak\PycharmProjects\sreality_detector\tests\testing_flat_data.json"
+model_config = {
+    "model_path": r"C:\Users\pacak\PycharmProjects\sreality_anomaly_detector\
+    model\lgbm_model.pickle"
+}
+TESTING_JSON_PATH = r"C:\Users\pacak\PycharmProjects\sreality_anomaly_detector\tests\
+    testing_flat_data.json"
 
 
 def test_distance_from_centre():
@@ -103,6 +110,7 @@ def test_predict():
     result = model.predict(flat_id_to_test)
     assert result["flat_id"] == flat_id_to_test
     assert abs(result["prediction_minus_actual_price"]) > 0
+
 
 def test_predict_nonexistingid():
     """Test predict method of LGBMModelInferor class."""
