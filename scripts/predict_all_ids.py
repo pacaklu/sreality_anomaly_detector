@@ -3,6 +3,7 @@ import logging
 
 import pandas as pd
 import requests
+from tqdm import tqdm
 from sreality_anomaly_detector.configs import prediction_config
 
 from scripts.email_sender import send_mail
@@ -28,13 +29,18 @@ def reconstruct_url_from_id(flat_id: int):
 
 
 if __name__ == "__main__":
+    logging.basicConfig(
+        filename=prediction_config["data_path"] + "final_predictions_training.log",
+        level=logging.INFO,
+        format="%(asctime)s : %(levelname)s : %(message)s",
+    )
     data = pd.read_csv(prediction_config["data_path"])
     flat_ids_to_test = data["ID"].tolist()
     predictions = []
     urls = []
     flat_ids = []
 
-    for flat_id in flat_ids_to_test:
+    for flat_id in tqdm(flat_ids_to_test):
 
         logging.info(f"Making prediction for flat id {flat_id}")
         api_url = prediction_config["api_url"] + str(flat_id)

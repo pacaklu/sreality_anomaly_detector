@@ -1,4 +1,4 @@
-"""Draft of the script for charts of the prices development. """
+"""Draft of the script for charts of the prices development. Not used so far."""
 import glob
 
 import numpy as np
@@ -10,8 +10,8 @@ import plotly.express as px
 class ChartGenerator:
     """Class for creation of plotly charts."""
 
-    def __init__(self, input_path):
-
+    def __init__(self, input_path: str):
+        """Initialize parameters."""
         self.html_page = None
         self.input_path = input_path
         self.list_of_dataframes = []
@@ -21,7 +21,11 @@ class ChartGenerator:
     def render_html_site(self):
         """Render html site with created charts."""
         # Initialize page
-        html_page = '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>Plotly Charts</title></head><body><script src="https://cdn.plot.ly/plotly-latest.min.js"></script>'
+        html_page = (
+            '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">'
+            "<title>Plotly Charts</title></head><body>"
+            '<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>'
+        )
 
         for div in self.list_of_html_divs:
             html_page = html_page + div
@@ -50,7 +54,9 @@ class ChartGenerator:
             y=mean_of_price_per_apartment,
             title="Mean price of flat.",
         )
-        self.list_of_html_divs.append(plotly.offline.plot(fig, include_plotlyjs=False, output_type="div"))
+        self.list_of_html_divs.append(
+            plotly.offline.plot(fig, include_plotlyjs=False, output_type="div")
+        )
 
     def create_chart_mean_per_1m(self):
         """Create chart mean of price per apartment."""
@@ -63,7 +69,9 @@ class ChartGenerator:
             y=mean_of_price_per_1m2,
             title="Mean price squared meter.",
         )
-        self.list_of_html_divs.append(plotly.offline.plot(fig, include_plotlyjs=False, output_type="div"))
+        self.list_of_html_divs.append(
+            plotly.offline.plot(fig, include_plotlyjs=False, output_type="div")
+        )
 
 
 if __name__ == "__main__":
