@@ -43,9 +43,12 @@ if __name__ == "__main__":
             r = requests.post(url=api_url, timeout=15)
             extracted_data = r.json()
 
+            prediction = extracted_data["prediction_minus_actual_price"]
+            flat_url = reconstruct_url_from_id(flat_id)
+
             flat_ids.append(flat_id)
-            predictions.append(extracted_data["prediction_minus_actual_price"])
-            urls.append(reconstruct_url_from_id(flat_id))
+            predictions.append(prediction)
+            urls.append(flat_url)
             logging.warning(f"Prediction succesfull for ID {flat_id}")
         except:
             logging.warning(f"Error while predicting for ID {flat_id}")
