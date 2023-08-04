@@ -29,15 +29,20 @@ def reconstruct_url_from_id(flat_id: int):
 
 
 if __name__ == "__main__":
+    logging.basicConfig(
+        filename=prediction_config["data_path"] + "final_predictions_training.log",
+        level=logging.INFO,
+        format="%(asctime)s : %(levelname)s : %(message)s",
+    )
     data = pd.read_csv(prediction_config["data_path"])
     flat_ids_to_test = data["ID"].tolist()
     predictions = []
     urls = []
     flat_ids = []
 
-    for flat_id in tqdm.tqdm(flat_ids_to_test):
+    for flat_id in tqdm(flat_ids_to_test):
 
-        logging.warning(f"Making prediction for flat id {flat_id}")
+        logging.info(f"Making prediction for flat id {flat_id}")
         api_url = prediction_config["api_url"] + str(flat_id)
         try:
             r = requests.post(url=api_url, timeout=5)
@@ -46,9 +51,9 @@ if __name__ == "__main__":
             flat_ids.append(flat_id)
             predictions.append(extracted_data["prediction_minus_actual_price"])
             urls.append(reconstruct_url_from_id(flat_id))
-            logging.warning("ID predicted successfully.")
+            logging.info("ID predicted successfully.")
         except:
-            logging.warning("Error while predicting of the price.")
+            logging.info("Error while predicting of the price.")
 
     final_data = pd.DataFrame(
         {"flat_id": flat_ids, "prediction_minus_actual": predictions, "url": urls}
