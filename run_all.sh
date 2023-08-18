@@ -1,3 +1,5 @@
+#!/bin/sh
+
 cd /home/ec2-user/sreality_anomaly_detector
 git pull
 
