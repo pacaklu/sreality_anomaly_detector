@@ -1,4 +1,5 @@
 """Predict results for all scraped flats."""
+import json
 import os
 
 import pandas as pd
@@ -48,20 +49,27 @@ def predict_data_to_all_ids(prediction_config: dict, inference_model_config: dic
 
     for flat_id in tqdm(flat_ids_to_test):
         logger.info(f"Making prediction for ID {flat_id}")
+        flat_url = reconstruct_url_from_id(flat_id)
 
         if prediction_config["model_source"] == "API":
             api_url = prediction_config["api_url"] + str(flat_id)
-            r = requests.post(url=api_url, timeout=15)
-            extracted_data = r.json()
-            prediction = extracted_data["prediction_minus_actual_price"]
+            try:
+                r = requests.post(url=api_url, timeout=15)
+                extracted_data = r.json()
+                prediction = extracted_data["prediction_minus_actual_price"]
+                flat_ids.append(flat_id)
+                predictions.append(prediction)
+                urls.append(flat_url)
+                logger.info(f"Prediction successful for ID {flat_id}")
+            except json.JSONDecodeError:
+                logger.warning(f"Prediction unsuccessful for ID {flat_id}")
+
         else:
             prediction = model.predict(flat_id)["prediction_minus_actual_price"]
-
-        flat_url = reconstruct_url_from_id(flat_id)
-        flat_ids.append(flat_id)
-        predictions.append(prediction)
-        urls.append(flat_url)
-        logger.info(f"Prediction successful for ID {flat_id}")
+            flat_ids.append(flat_id)
+            predictions.append(prediction)
+            urls.append(flat_url)
+            logger.info(f"Prediction successful for ID {flat_id}")
 
     final_data = pd.DataFrame(
         {"flat_id": flat_ids, "prediction_minus_actual": predictions, "url": urls}
