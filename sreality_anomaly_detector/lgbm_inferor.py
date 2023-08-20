@@ -1,5 +1,4 @@
 """Inference class for prediction of flat price."""
-import logging
 import pickle
 from typing import Optional
 
@@ -142,28 +141,24 @@ class LGBMModelInferor(LGBMMBaseModel):
     def _request_flat_data(self, input_flat_id: int) -> dict:
         """Request Sreality api with flat id to receive data."""
         url = f"https://www.sreality.cz/api/cs/v2/estates/{input_flat_id}"
-        obtained_json = requests.get(url=url).json()
+        obtained_json = requests.get(url=url, timeout=5).json()
         return obtained_json
 
     def predict(self, input_flat_id: int):
         """Predict price of the flat."""
-        try:
-            logging.info("Loading Model")
-            self._load_model()
-            logging.info("Model successfully loaded")
+        self._load_model()
+        obtained_json = self._request_flat_data(input_flat_id)
+        preprocessed_data = extract_one_flat_details(obtained_json)
+        self.data = pd.DataFrame(preprocessed_data, index=[0])
+        self.retype_data()
 
-            logging.info("Trying to request data from Sreality API")
-            obtained_json = self._request_flat_data(input_flat_id)
-            logging.info("Data successfully requested")
+        if self.config['filter_query']:
+            self.data = self.data.query(self.config['filter_query'])
 
-            preprocessed_data = extract_one_flat_details(obtained_json)
-            self.data = pd.DataFrame(preprocessed_data, index=[0])
-
-            self.retype_data()
-            logging.info("Data successfully preprocessed")
+        if len(self.data)>0:
             prediction = self.model.predict(self.data[self.preds])
             prediction_minus_actual = prediction[0] - self.data["price"][0]
-        except:
+        else:
             prediction_minus_actual = float("nan")
 
         return {

@@ -40,7 +40,7 @@ class LGBMMBaseModel:
 
         # Weird columns, that have numeric values, 'true' values and nan values
         for col in ["parking"]:
-            self.data[col] = np.where(self.data[col] == "True", "1", self.data[col])
+            self.data[col] = np.where(self.data[col] is True, 1, self.data[col])
             self.data[col] = self.data[col].astype("float")
 
         for col in self.numerical_cols:

@@ -1,5 +1,6 @@
 """Model config."""
-inference_model_config = {"model_path": "/models/lgbm_model.pickle"}
+inference_model_config = {"model_path": "/models/lgbm_model.pickle",
+                          "filter_query": "price < 6000000 and floor!='-1'"}
 
 scrape_config = {"data_path": "/data/"}
 

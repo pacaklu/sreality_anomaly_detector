@@ -15,8 +15,9 @@ model_config = {
     "model_path": r"C:\Users\pacak\PycharmProjects\sreality_anomaly_detector\
     model\lgbm_model.pickle"
 }
-TESTING_JSON_PATH = r"C:\Users\pacak\PycharmProjects\sreality_anomaly_detector\tests\
-    testing_flat_data.json"
+TESTING_JSON_PATH = (
+    r"C:\Users\pacak\PycharmProjects\sreality_anomaly_detector\tests"
+    r"\testing_flat_data.json")
 
 
 def test_distance_from_centre():

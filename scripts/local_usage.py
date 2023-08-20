@@ -22,7 +22,10 @@ local_prediction_config = {
     "model_source": "local",
 }
 local_inference_model_config = {
-    "model_path": r"C:/Users/pacak/PycharmProjects/models/lgbm_model.pickle"
+    "model_path": (
+        r"C:\Users\pacak\PycharmProjects\sreality_anomaly_detector"
+        r"\models\lgbm_model.pickle" ),
+    "filter_query": "price < 6000000 and floor!='-1'"
 }
 
 RUN_LOCAL_SCRAPER = False
