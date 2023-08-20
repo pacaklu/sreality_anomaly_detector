@@ -1,5 +1,6 @@
 """Training class for flat prices prediction."""
 import logging
+import os
 import pickle
 
 import lightgbm as lgb
@@ -10,8 +11,9 @@ import seaborn as sns
 from sklearn.metrics import r2_score
 from sklearn.model_selection import KFold
 
-from configs import training_config
-from lgbm_base import LGBMMBaseModel
+from sreality_anomaly_detector.configs import training_config
+from sreality_anomaly_detector.lgbm_base import LGBMMBaseModel
+from sreality_anomaly_detector.logger import add_logger, close_logger
 
 
 class LGBMModelTrainer(LGBMMBaseModel):
@@ -34,6 +36,9 @@ class LGBMModelTrainer(LGBMMBaseModel):
             "seed": 1234,
             "verbosity": 0,
         }
+        self.logger = add_logger(
+            os.path.join(config["path_to_save"], "model_training.log")
+        )
 
     def load_data(self):
         """Load the data."""
@@ -59,7 +64,7 @@ class LGBMModelTrainer(LGBMMBaseModel):
 
         return booster.best_iteration
 
-    def compute_var_imp(self, model: lgb.booster):
+    def compute_var_imp(self, model):
         """Compute variable importance."""
         importance_df = pd.DataFrame()
         importance_df["Feature"] = self.preds
@@ -98,7 +103,7 @@ class LGBMModelTrainer(LGBMMBaseModel):
                 )
             )
 
-        logging.info(f"Optimal number of trees: {int(np.mean(lgbm_rounds))}")
+        self.logger.info(f"Optimal number of trees: {int(np.mean(lgbm_rounds))}")
         return int(np.mean(lgbm_rounds))
 
     def final_model(self, data: pd.DataFrame, target: pd.Series):
@@ -116,32 +121,29 @@ class LGBMModelTrainer(LGBMMBaseModel):
         """Pipeline that run everything."""
         self.load_data()
         self.retype_data()
-        logging.info("Starting oof Cross Validation fit.")
+        self.logger.info("Starting oof Cross Validation fit.")
         n_trees = self.train_model_CV()
         # Replace number of iteration for final model
         self.params["num_boost_round"] = n_trees
-        logging.info("Starting of final model training.")
+        self.logger.info("Starting of final model training.")
         final_model = self.final_model(self.data[self.preds], self.data[self.target])
-        logging.info("Model succesfully trained.")
+        self.logger.info("Model succesfully trained.")
 
         self.data["predictions"] = final_model.predict(self.data[self.preds])
-        logging.info("R2 score of final model:")
-        logging.info(r2_score(self.data[self.target], self.data["predictions"]))
+        self.logger.info("R2 score of final model:")
+        self.logger.info(r2_score(self.data[self.target], self.data["predictions"]))
         self.compute_var_imp(final_model)
 
         # Save model
-        logging.info("Saving of the model.")
+        self.logger.info("Saving of the model.")
         pickle.dump(
-            final_model, open(self.config["path_to_save"] + "lgbm_model.pickle", "wb")
+            final_model,
+            open(os.path.join(self.config["path_to_save"], "lgbm_model.pickle"), "wb"),
         )
-        logging.info("Model succesfully saved.")
+        self.logger.info("Model succesfully saved.")
+        close_logger(self.logger)
 
 
 if __name__ == "__main__":
-    logging.basicConfig(
-        filename=training_config["path_to_save"] + "model_training.log",
-        level=logging.INFO,
-        format="%(asctime)s : %(levelname)s : %(message)s",
-    )
     model = LGBMModelTrainer(training_config)
     model.fit_and_predict()

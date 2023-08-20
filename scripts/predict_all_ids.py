@@ -1,14 +1,17 @@
 """Predict results for all scraped flats."""
-import logging
+import os
 
 import pandas as pd
 import requests
 from tqdm import tqdm
-from sreality_anomaly_detector.configs import prediction_config
 
 from scripts.email_sender import send_mail
+from sreality_anomaly_detector.configs import inference_model_config, prediction_config
+from sreality_anomaly_detector.lgbm_inferor import LGBMModelInferor
+from sreality_anomaly_detector.logger import add_logger, close_logger
 
 FLATS_TO_SEND = 15
+
 
 def reconstruct_url_from_id(flat_id: int):
     """Reconstruct url from if of apartment to be easily visualise."""
@@ -28,30 +31,37 @@ def reconstruct_url_from_id(flat_id: int):
     return url_obtained
 
 
-if __name__ == "__main__":
-    data = pd.read_csv(prediction_config["data_path"])
+def predict_data_to_all_ids(prediction_config: dict, inference_model_config: dict):
+    """Make prediction for flat ids from the config path."""
+    logger = add_logger(
+        os.path.join(prediction_config["data_path"], "predictions_all.log")
+    )
+    data = pd.read_csv(os.path.join(prediction_config["data_path"], "scrape.csv"))
     flat_ids_to_test = data["ID"].tolist()
     predictions = []
     urls = []
     flat_ids = []
 
-    logging.warning(f"Making prediction for all flat ids")
-    for flat_id in tqdm(flat_ids_to_test):
+    logger.info("Making prediction for all flat ids")
+    if prediction_config["model_source"] == "local":
+        model = LGBMModelInferor(inference_model_config)
 
-        api_url = prediction_config["api_url"] + str(flat_id)
-        try:
+    for flat_id in tqdm(flat_ids_to_test):
+        logger.info(f"Making prediction for ID {flat_id}")
+
+        if prediction_config["model_source"] == "API":
+            api_url = prediction_config["api_url"] + str(flat_id)
             r = requests.post(url=api_url, timeout=15)
             extracted_data = r.json()
-
             prediction = extracted_data["prediction_minus_actual_price"]
-            flat_url = reconstruct_url_from_id(flat_id)
+        else:
+            prediction = model.predict(flat_id)["prediction_minus_actual_price"]
 
-            flat_ids.append(flat_id)
-            predictions.append(prediction)
-            urls.append(flat_url)
-            logging.warning(f"Prediction succesfull for ID {flat_id}")
-        except:
-            logging.warning(f"Error while predicting for ID {flat_id}")
+        flat_url = reconstruct_url_from_id(flat_id)
+        flat_ids.append(flat_id)
+        predictions.append(prediction)
+        urls.append(flat_url)
+        logger.info(f"Prediction successful for ID {flat_id}")
 
     final_data = pd.DataFrame(
         {"flat_id": flat_ids, "prediction_minus_actual": predictions, "url": urls}
@@ -60,6 +70,15 @@ if __name__ == "__main__":
         by="prediction_minus_actual", ascending=False
     ).head(FLATS_TO_SEND)
     # Save the predicted data to csv
-    final_data.to_csv(prediction_config["data_path"], header=True, index=False)
+    final_data.to_csv(
+        os.path.join(prediction_config["data_path"], "predictions.csv"),
+        header=True,
+        index=False,
+    )
     # Send them with email
-    send_mail(prediction_config["data_path"])
+    send_mail(os.path.join(prediction_config["data_path"], "predictions.csv"))
+    close_logger(logger)
+
+
+if __name__ == "__main__":
+    predict_data_to_all_ids(prediction_config, inference_model_config)

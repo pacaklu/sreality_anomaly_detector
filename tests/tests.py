@@ -7,11 +7,9 @@ import pandas as pd
 
 sys.path.append(r"C:\Users\pacak\PycharmProjects\sreality_anomaly_detector")
 
-from sreality_anomaly_detector.lgbm_inferor import (
-    LGBMModelInferor,
-    distance_from_centre,
-    extract_one_flat_details,
-)
+from sreality_anomaly_detector.lgbm_inferor import (LGBMModelInferor,
+                                                    distance_from_centre,
+                                                    extract_one_flat_details)
 
 model_config = {
     "model_path": r"C:\Users\pacak\PycharmProjects\sreality_anomaly_detector\

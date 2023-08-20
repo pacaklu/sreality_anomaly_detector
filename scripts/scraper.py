@@ -1,12 +1,14 @@
 """Class for scraping of flats from Sreality."""
 import logging
 import math
+import os
 from typing import Optional
 
 import pandas as pd
 import requests
 from sreality_anomaly_detector.configs import scrape_config
 from sreality_anomaly_detector.lgbm_inferor import extract_one_flat_details
+from sreality_anomaly_detector.logger import add_logger, close_logger
 from tqdm import tqdm
 
 # Available is 20, 40, 60
@@ -21,6 +23,9 @@ class SrealityScraper:
         self.config = scrape_config
         self.number_of_pages_to_scrap = None
         self.list_of_flat_ids = None
+        self.logger = add_logger(
+            os.path.join(scrape_config["data_path"], "scraping.log")
+        )
 
     def count_number_of_pages_needed(self):
         """Obtain how many pages we have to scrape."""
@@ -69,7 +74,7 @@ class SrealityScraper:
         try:
             obtained_json = requests.get(url=url, timeout=5)
             obtained_json = obtained_json.json()
-        except:
+        except requests.exceptions.Timeout:
             return {}
 
         return obtained_json
@@ -78,19 +83,26 @@ class SrealityScraper:
         """Create and save dataframe with all scraped flats."""
         list_of_dicts = []
         list_of_valid_flat_ids = []
-        for flat_id in tqdm(self.list_of_flat_ids):
+        for flat_id in tqdm(self.list_of_flat_ids[:5]):
+            self.logger.info(f"Processing flat ID {flat_id}")
             flat_api_response = self.request_one_flat(flat_id)
             one_flat_details = extract_one_flat_details(flat_api_response)
 
             if one_flat_details:
                 list_of_dicts.append(one_flat_details)
                 list_of_valid_flat_ids.append(flat_id)
+            self.logger.info(f"Flat ID {flat_id} processed.")
 
         dataframe = pd.DataFrame(list_of_dicts)
         dataframe["ID"] = list_of_valid_flat_ids
-        logging.info("Creating scraped Dataframe and saving.")
-        dataframe.to_csv(self.config["data_path"], header=True, index=False)
-        logging.info(f"Data saved into {self.config['data_path']}.")
+        self.logger.info("Creating scraped Dataframe and saving.")
+        dataframe.to_csv(
+            os.path.join(self.config["data_path"], "scrape.csv"),
+            header=True,
+            index=False,
+        )
+        self.logger.info("Data succesfully saved. ")
+        close_logger(self.logger)
 
     def scrape_pipeline(self):
         """One function that wraps all steps."""
