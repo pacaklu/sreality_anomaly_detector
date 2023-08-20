@@ -83,7 +83,7 @@ class SrealityScraper:
         """Create and save dataframe with all scraped flats."""
         list_of_dicts = []
         list_of_valid_flat_ids = []
-        for flat_id in tqdm(self.list_of_flat_ids[:5]):
+        for flat_id in tqdm(self.list_of_flat_ids[:100]):
             self.logger.info(f"Processing flat ID {flat_id}")
             flat_api_response = self.request_one_flat(flat_id)
             one_flat_details = extract_one_flat_details(flat_api_response)
