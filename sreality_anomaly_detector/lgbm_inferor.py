@@ -152,8 +152,8 @@ class LGBMModelInferor(LGBMMBaseModel):
         self.data = pd.DataFrame(preprocessed_data, index=[0])
         self.retype_data()
 
-        if self.config['filter_query']:
-            self.data = self.data.query(self.config['filter_query'])
+        #if self.config['filter_query']:
+        #    self.data = self.data.query(self.config['filter_query'])
 
         if len(self.data)>0:
             prediction = self.model.predict(self.data[self.preds])
