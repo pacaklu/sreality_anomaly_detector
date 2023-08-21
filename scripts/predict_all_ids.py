@@ -49,13 +49,20 @@ def predict_data_to_all_ids(prediction_config: dict, inference_model_config: dic
 
     for flat_id in tqdm(flat_ids_to_test):
         logger.info(f"Making prediction for ID {flat_id}")
-        flat_url = reconstruct_url_from_id(flat_id)
+        try:
+            flat_url = reconstruct_url_from_id(flat_id)
+        except KeyError:
+            logger.warning(f"Prediction unsuccessful for ID {flat_id}. "
+                           f"impossible to reconstruct url.")
+            continue
+
 
         if prediction_config["model_source"] == "API":
             api_url = prediction_config["api_url"] + str(flat_id)
             try:
                 r = requests.post(url=api_url, timeout=15)
                 extracted_data = r.json()
+                logger.info(f"{extracted_data}")
                 prediction = extracted_data["prediction_minus_actual_price"]
                 flat_ids.append(flat_id)
                 predictions.append(prediction)
