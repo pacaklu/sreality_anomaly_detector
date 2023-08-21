@@ -60,11 +60,8 @@ def predict_data_to_all_ids(prediction_config: dict, inference_model_config: dic
         if prediction_config["model_source"] == "API":
             api_url = prediction_config["api_url"] + str(flat_id)
             try:
-                logger.info(f"Calliing endpooint")
                 r = requests.post(url=api_url, timeout=15)
-                logger.info(f"Endpooint called")
                 extracted_data = r.json()
-                logger.info(f"{extracted_data}")
                 prediction = extracted_data["prediction_minus_actual_price"]
                 flat_ids.append(flat_id)
                 predictions.append(prediction)

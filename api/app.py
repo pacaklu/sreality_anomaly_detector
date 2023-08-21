@@ -17,5 +17,4 @@ def root():
 @app.post("/predict")
 def predict(input_data):
     """Predict method of the model class."""
-    print(input_data)
     return model.predict(input_data)

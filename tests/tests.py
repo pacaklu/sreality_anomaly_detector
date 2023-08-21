@@ -11,10 +11,14 @@ from sreality_anomaly_detector.lgbm_inferor import (LGBMModelInferor,
                                                     distance_from_centre,
                                                     extract_one_flat_details)
 
-model_config = {
-    "model_path": r"C:\Users\pacak\PycharmProjects\sreality_anomaly_detector\
-    model\lgbm_model.pickle"
+local_inference_model_config = {
+    "model_path": (
+        r"C:\Users\pacak\PycharmProjects\sreality_anomaly_detector"
+        r"\models\lgbm_model.pickle" ),
+    "filter_query": "price < 6000000 and floor!='-1'"
 }
+
+
 TESTING_JSON_PATH = (
     r"C:\Users\pacak\PycharmProjects\sreality_anomaly_detector\tests"
     r"\testing_flat_data.json")
@@ -87,7 +91,7 @@ def test_constructor():
 def test_request_flat_data():
     """Test whether request for flat returns proper results."""
     model = LGBMModelInferor(model_config)
-    flat_id_to_test = 4065768524
+    flat_id_to_test = 1120420940
     obtained_json = model._request_flat_data(flat_id_to_test)
     assert len(obtained_json) > 0
     assert type(obtained_json) == dict
@@ -104,8 +108,8 @@ def test_load_model():
 
 def test_predict():
     """Test predict method of LGBMModelInferor class."""
-    model = LGBMModelInferor(model_config)
-    flat_id_to_test = 4065768524
+    model = LGBMModelInferor(local_inference_model_config)
+    flat_id_to_test = 1259430988
     result = model.predict(flat_id_to_test)
     assert result["flat_id"] == flat_id_to_test
     assert abs(result["prediction_minus_actual_price"]) > 0
