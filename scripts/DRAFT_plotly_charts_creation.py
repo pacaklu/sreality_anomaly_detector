@@ -6,6 +6,8 @@ import pandas as pd
 import plotly
 import plotly.express as px
 
+input_path = r"C:\\Users\\pacak\\PycharmProjects\\pythonProject\\"
+
 
 class ChartGenerator:
     """Class for creation of plotly charts."""
@@ -75,7 +77,6 @@ class ChartGenerator:
 
 
 if __name__ == "__main__":
-    input_path = r"C:\\Users\\pacak\\PycharmProjects\\pythonProject\\"
     generator = ChartGenerator(input_path)
     generator.load_data()
     generator.create_chart_mean()

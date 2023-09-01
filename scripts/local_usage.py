@@ -3,8 +3,8 @@ import sys
 
 sys.path.append(r"/")
 
-from scripts.predict_all_ids import predict_data_to_all_ids  # noqa
-from scripts.scraper import SrealityScraper  # noqa
+from sreality_anomaly_detector.predict_all_ids import predict_data_to_all_ids  # noqa
+from sreality_anomaly_detector.scraper import SrealityScraper  # noqa
 from sreality_anomaly_detector.lgbm_trainer import LGBMModelTrainer  # noqa
 
 local_training_config = {

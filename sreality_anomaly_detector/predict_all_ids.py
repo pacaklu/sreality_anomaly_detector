@@ -6,7 +6,7 @@ import pandas as pd
 import requests
 from tqdm import tqdm
 
-from scripts.email_sender import send_mail
+from sreality_anomaly_detector.email_sender import send_mail
 from sreality_anomaly_detector.configs import inference_model_config, prediction_config
 from sreality_anomaly_detector.lgbm_inferor import LGBMModelInferor
 from sreality_anomaly_detector.logger import add_logger, close_logger

@@ -10,7 +10,6 @@ COPY ./requirements/requirements.txt /sreality_anomaly_detector
 RUN pip install -r requirements.txt
 
 # Copy files
-COPY ./scripts /sreality_anomaly_detector/scripts
 COPY ./sreality_anomaly_detector /sreality_anomaly_detector/sreality_anomaly_detector
 
-CMD [ "python", "-u", "./scripts/predict_all_ids.py"]
+CMD [ "python", "-u", "./sreality_anomaly_detector/predict_all_ids.py"]

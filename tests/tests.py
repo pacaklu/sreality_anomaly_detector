@@ -10,14 +10,9 @@ sys.path.append(r"C:\Users\pacak\PycharmProjects\sreality_anomaly_detector")
 from sreality_anomaly_detector.lgbm_inferor import (LGBMModelInferor,
                                                     distance_from_centre,
                                                     extract_one_flat_details)
-
-local_inference_model_config = {
-    "model_path": (
-        r"C:\Users\pacak\PycharmProjects\sreality_anomaly_detector"
-        r"\models\lgbm_model.pickle" ),
-    "filter_query": "price < 6000000 and floor!='-1'"
-}
-
+from scripts.local_usage import local_inference_model_config
+# TODO: so far only tests for model model inference are presented
+# TODO: add also tests for model training and scraping
 
 TESTING_JSON_PATH = (
     r"C:\Users\pacak\PycharmProjects\sreality_anomaly_detector\tests"
@@ -62,7 +57,7 @@ def test_extract_one_flat_details():
 
 def test_constructor():
     """Test constructor of LGBMModelInferor class."""
-    model = LGBMModelInferor(model_config)
+    model = LGBMModelInferor(local_inference_model_config)
     assert model.numerical_cols == [
         "area",
         "elevator",
@@ -90,7 +85,7 @@ def test_constructor():
 
 def test_request_flat_data():
     """Test whether request for flat returns proper results."""
-    model = LGBMModelInferor(model_config)
+    model = LGBMModelInferor(local_inference_model_config)
     flat_id_to_test = 1120420940
     obtained_json = model._request_flat_data(flat_id_to_test)
     assert len(obtained_json) > 0
@@ -99,7 +94,7 @@ def test_request_flat_data():
 
 def test_load_model():
     """Test _load method."""
-    model = LGBMModelInferor(model_config)
+    model = LGBMModelInferor(local_inference_model_config)
     model._load_model()
     # Check whether model is properly loaded by having
     # model.model.best_iteration > 0
@@ -117,7 +112,7 @@ def test_predict():
 
 def test_predict_nonexistingid():
     """Test predict method of LGBMModelInferor class."""
-    model = LGBMModelInferor(model_config)
+    model = LGBMModelInferor(local_inference_model_config)
     flat_id_to_test = 999784894406576120124154512218524
     result = model.predict(flat_id_to_test)
     assert result["flat_id"] == flat_id_to_test

@@ -150,12 +150,19 @@ class LGBMModelInferor(LGBMMBaseModel):
         obtained_json = self._request_flat_data(input_flat_id)
         preprocessed_data = extract_one_flat_details(obtained_json)
         self.data = pd.DataFrame(preprocessed_data, index=[0])
-        self.retype_data()
+        try:
+            self.retype_data()
+        except KeyError:
+            return {
+                "flat_id": input_flat_id,
+                "prediction_minus_actual_price": float("nan"),
+            }
+
 
         if self.config['filter_query']:
             self.data = self.data.query(self.config['filter_query'])
 
-        if len(self.data)>0:
+        if len(self.data) > 0:
             prediction = self.model.predict(self.data[self.preds])
             prediction_minus_actual = prediction[0] - self.data["price"][0]
         else:
