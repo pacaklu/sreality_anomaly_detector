@@ -59,34 +59,36 @@ def extract_one_flat_details(obtained_json: dict) -> Optional[dict]:
     dict_of_info["price"] = obtained_json["price_czk"]["value_raw"]
 
     for item in obtained_json["items"]:
-        if item["name"] == "Stavba":
-            dict_of_info["building"] = item["value"]
-        if item["name"] == "Stav objektu":
-            dict_of_info["condition"] = item["value"]
-        if item["name"] == "Vlastnictví":
-            dict_of_info["ownership"] = item["value"]
-        if item["name"] == "Podlaží":
-            dict_of_info["floor"] = item["value"][0]
-        if item["name"] == "Užitná plocha":
-            dict_of_info["area"] = item["value"]
-        if item["type"] == "energy_efficiency_rating":
-            dict_of_info["energy_type"] = item["value_type"]
-        if item["name"] == "Výtah":
-            dict_of_info["elevator"] = item["value"]
-        if item["name"] == "Parkování":
-            dict_of_info["parking"] = item["value"]
-        if item["name"] == "Bezbariérový":
-            dict_of_info["barrierless"] = item["value"]
-        if item["name"] == "Vybavení":
-            dict_of_info["equipped"] = item["value"]
-        if item["name"] == "Lodžie":
-            dict_of_info["balcony"] = True
-        if item["name"] == "Terase":
-            dict_of_info["balcony"] = True
-        if item["name"] == "Balkón":
-            dict_of_info["balcony"] = True
-        if item["name"] == "Sklep":
-            dict_of_info["cellar"] = True
+        if "name" in item.keys():
+            if item["name"] == "Stavba":
+                dict_of_info["building"] = item["value"]
+            if item["name"] == "Stav objektu":
+                dict_of_info["condition"] = item["value"]
+            if item["name"] == "Vlastnictví":
+                dict_of_info["ownership"] = item["value"]
+            if item["name"] == "Podlaží":
+                dict_of_info["floor"] = item["value"][0]
+            if item["name"] == "Užitná plocha":
+                dict_of_info["area"] = item["value"]
+            if item["name"] == "Výtah":
+                dict_of_info["elevator"] = item["value"]
+            if item["name"] == "Parkování":
+                dict_of_info["parking"] = item["value"]
+            if item["name"] == "Bezbariérový":
+                dict_of_info["barrierless"] = item["value"]
+            if item["name"] == "Vybavení":
+                dict_of_info["equipped"] = item["value"]
+            if item["name"] == "Lodžie":
+                dict_of_info["balcony"] = True
+            if item["name"] == "Terase":
+                dict_of_info["balcony"] = True
+            if item["name"] == "Balkón":
+                dict_of_info["balcony"] = True
+            if item["name"] == "Sklep":
+                dict_of_info["cellar"] = True
+        if "type" in item.keys():
+            if item["type"] == "energy_efficiency_rating":
+                dict_of_info["energy_type"] = item["value_type"]
 
     if "poi" in obtained_json.keys():
         for poi in obtained_json["poi"]:
