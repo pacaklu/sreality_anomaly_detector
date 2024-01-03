@@ -3,9 +3,10 @@ import sys
 
 sys.path.append(r"/")
 
-from sreality_anomaly_detector.predict_all_ids import predict_data_to_all_ids  # noqa
-from sreality_anomaly_detector.scraper import SrealityScraper  # noqa
 from sreality_anomaly_detector.lgbm_trainer import LGBMModelTrainer  # noqa
+from sreality_anomaly_detector.predict_all_ids import \
+    predict_data_to_all_ids  # noqa
+from sreality_anomaly_detector.scraper import SrealityScraper  # noqa
 
 local_training_config = {
     "input_path": (
@@ -13,6 +14,7 @@ local_training_config = {
         r"\data\data_example.csv"
     ),
     "path_to_save": r"C:\Users\pacak\PycharmProjects\sreality_anomaly_detector\models",
+    "perform_OHE": False,
 }
 local_scrape_config = {
     "data_path": (r"C:\Users\pacak\PycharmProjects\sreality_anomaly_detector\data")
@@ -24,13 +26,18 @@ local_prediction_config = {
 local_inference_model_config = {
     "model_path": (
         r"C:\Users\pacak\PycharmProjects\sreality_anomaly_detector"
-        r"\models\lgbm_model.pickle" ),
+        r"\models\lgbm_model.pickle"),
+    "ohe_model_path": (
+        r"C:\Users\pacak\PycharmProjects\sreality_anomaly_detector"
+        r"\models\ohe_model.pickle"),
+    "shap_explainer_model_path": r"C:\Users\pacak\PycharmProjects\sreality_anomaly_detector\models\shap_explainer_model.pickle",
+    "perform_OHE": False,
     "filter_query": "price < 6000000 and floor!='-1'"
 }
 
-RUN_LOCAL_SCRAPER = False
+RUN_LOCAL_SCRAPER = True
 RUN_LOCAL_TRAINING = False
-RUN_LOCAL_PREDICTIONS = True
+RUN_LOCAL_PREDICTIONS = False
 
 
 # Local Scrape of data

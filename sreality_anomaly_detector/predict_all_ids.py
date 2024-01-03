@@ -52,10 +52,11 @@ def predict_data_to_all_ids(prediction_config: dict, inference_model_config: dic
         try:
             flat_url = reconstruct_url_from_id(flat_id)
         except KeyError:
-            logger.warning(f"Prediction unsuccessful for ID {flat_id}. "
-                           f"impossible to reconstruct url.")
+            logger.warning(
+                f"Prediction unsuccessful for ID {flat_id}. "
+                f"impossible to reconstruct url."
+            )
             continue
-
 
         if prediction_config["model_source"] == "API":
             api_url = prediction_config["api_url"] + str(flat_id)

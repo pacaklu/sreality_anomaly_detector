@@ -134,11 +134,11 @@ class LGBMModelInferor(LGBMMBaseModel):
         super().__init__()
         self.config = config
         self.model = None
-
-    def _load_model(self):
-        """Load LGBM model from path."""
+        self.shap_explainer_model = None
         with open(self.config["model_path"], "rb") as file:
             self.model = pickle.load(file)
+        with open(self.config["shap_explainer_model_path"], "rb") as file:
+            self.shap_explainer_model = pickle.load(file)
 
     def _request_flat_data(self, input_flat_id: int) -> dict:
         """Request Sreality api with flat id to receive data."""
@@ -146,31 +146,121 @@ class LGBMModelInferor(LGBMMBaseModel):
         obtained_json = requests.get(url=url, timeout=5).json()
         return obtained_json
 
+    def predict_shap_values(self):
+        """Predict shap values of for the given data."""
+        shap_values = self.shap_explainer_model(self.data[self.preds])
+
+        if isinstance(shap_values, list):
+            self.shap_values = shap_values[1]
+        else:
+            self.shap_values = shap_values
+
+        self.shap_values = pd.DataFrame(shap_values)
+
+        def extract_increasing_price_col(row, pos):
+            """Extract feature that is increasing the price on position pos."""
+            pos_values = []
+            for i in range(len(self.preds)):
+                if row[i] > 0:
+                    pos_values.append(row[i])
+
+            pos_values.sort(reverse=True)
+            try:
+                des_val = pos_values[(pos - 1)]
+                des_column = self.preds[list(row).index(des_val)]
+            except IndexError:
+                return "None"
+
+            return {des_column: des_val}
+
+        def extract_decreasing_price_col(row, pos):
+            """Extract feature that is increasing the price on position pos."""
+            neg_values = []
+            for i in range(len(self.preds)):
+                if row[i] < 0:
+                    neg_values.append(abs(row[i]))
+
+            neg_values.sort(reverse=True)
+            try:
+                des_val = neg_values[(pos - 1)] * (-1)
+                des_column = self.preds[list(row).index(des_val)]
+            except IndexError:
+                return "None"
+
+            return {des_column: des_val}
+
+        for val in [1, 2, 3]:
+            self.shap_values[
+                f"top_{val}_increasing_price_feature"
+            ] = self.shap_values.apply(
+                extract_increasing_price_col, args=(val,), axis=1
+            )
+            self.shap_values[
+                f"top_{val}_decreasing_price_feature"
+            ] = self.shap_values.apply(
+                extract_decreasing_price_col, args=(val,), axis=1
+            )
+
     def predict(self, input_flat_id: int):
         """Predict price of the flat."""
-        self._load_model()
         obtained_json = self._request_flat_data(input_flat_id)
         preprocessed_data = extract_one_flat_details(obtained_json)
         self.data = pd.DataFrame(preprocessed_data, index=[0])
         try:
-            self.retype_data()
+            self.preprocess_data()
+            if self.config["perform_OHE"]:
+                self.ohe_predict(self.config["ohe_model_path"])
         except KeyError:
             return {
                 "flat_id": input_flat_id,
                 "prediction_minus_actual_price": float("nan"),
+                "top_1_increasing_price_feature": float("nan"),
+                "top_1_decreasing_price_feature": float("nan"),
+                "top_2_increasing_price_feature": float("nan"),
+                "top_2_decreasing_price_feature": float("nan"),
+                "top_3_increasing_price_feature": float("nan"),
+                "top_3_decreasing_price_feature": float("nan"),
             }
 
-
-        if self.config['filter_query']:
-            self.data = self.data.query(self.config['filter_query'])
+        if self.config["filter_query"]:
+            self.data = self.data.query(self.config["filter_query"])
 
         if len(self.data) > 0:
             prediction = self.model.predict(self.data[self.preds])
             prediction_minus_actual = prediction[0] - self.data["price"][0]
+            top_1_increasing_price_feature = self.shap_values[
+                "top_1_increasing_price_feature"
+            ].iloc[0]
+            top_1_decreasing_price_feature = self.shap_values[
+                "top_1_decreasing_price_feature"
+            ].iloc[0]
+            top_2_increasing_price_feature = self.shap_values[
+                "top_2_increasing_price_feature"
+            ].iloc[0]
+            top_2_decreasing_price_feature = self.shap_values[
+                "top_2_decreasing_price_feature"
+            ].iloc[0]
+            top_3_increasing_price_feature = self.shap_values[
+                "top_3_increasing_price_feature"
+            ].iloc[0]
+            top_3_decreasing_price_feature = self.shap_values[
+                "top_3_decreasing_price_feature"
+            ].iloc[0]
         else:
             prediction_minus_actual = float("nan")
-
+            top_1_increasing_price_feature = float("nan")
+            top_1_decreasing_price_feature = float("nan")
+            top_2_increasing_price_feature = float("nan")
+            top_2_decreasing_price_feature = float("nan")
+            top_3_increasing_price_feature = float("nan")
+            top_3_decreasing_price_feature = float("nan")
         return {
             "flat_id": input_flat_id,
             "prediction_minus_actual_price": prediction_minus_actual,
+            "top_1_increasing_price_feature": top_1_increasing_price_feature,
+            "top_1_decreasing_price_feature": top_1_decreasing_price_feature,
+            "top_2_increasing_price_feature": top_2_increasing_price_feature,
+            "top_2_decreasing_price_feature": top_2_decreasing_price_feature,
+            "top_3_increasing_price_feature": top_3_increasing_price_feature,
+            "top_3_decreasing_price_feature": top_3_decreasing_price_feature,
         }

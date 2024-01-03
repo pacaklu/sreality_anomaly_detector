@@ -8,8 +8,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
+import shap
 from sklearn.metrics import r2_score
 from sklearn.model_selection import KFold
+from sklearn.preprocessing import OneHotEncoder
 
 from sreality_anomaly_detector.configs import training_config
 from sreality_anomaly_detector.lgbm_base import LGBMMBaseModel
@@ -39,10 +41,21 @@ class LGBMModelTrainer(LGBMMBaseModel):
         self.logger = add_logger(
             os.path.join(config["path_to_save"], "model_training.log")
         )
+        self.shap_values = None
 
     def load_data(self):
         """Load the data."""
         self.data = pd.read_csv(self.config["input_path"])
+
+    def ohe_fit(self):
+        """Fit and save one hot encoder."""
+        enc = OneHotEncoder(sparse=False)
+        enc.fit(self.data[self.categorical_cols])
+
+        pickle.dump(
+            enc,
+            open(os.path.join(self.config["path_to_save"], "ohe_model.pickle"), "wb"),
+        )
 
     def one_model_lgbm(
         self,
@@ -117,10 +130,54 @@ class LGBMModelTrainer(LGBMMBaseModel):
         )
         return booster
 
+    def print_shap_values(self, model: lgb.Booster, ret: bool = False):
+        """Compute SHAP values of the model for the data."""
+        explainer = shap.TreeExplainer(model)
+
+        pickle.dump(
+            explainer,
+            open(
+                os.path.join(
+                    self.config["path_to_save"], "shap_explainer_model.pickle"
+                ),
+                "wb",
+            ),
+        )
+
+        shap_values = explainer.shap_values(self.data[self.preds])
+
+        if isinstance(shap_values, list):
+            self.shap_values = shap_values[1]
+        else:
+            self.shap_values = shap_values
+
+        shap.summary_plot(self.shap_values, self.data[self.preds])
+        shap.summary_plot(self.shap_values, self.data[self.preds], plot_type="bar")
+
+        if ret:
+            return self.shap_values, explainer
+
+    def shap_dependence_plot(self, column: str, interaction_column: str = None):
+        """Plot SHAP dependence plot."""
+        if interaction_column:
+            shap.dependence_plot(
+                column,
+                self.shap_values,
+                self.data[self.preds],
+                interaction_index=interaction_column,
+            )
+        else:
+            shap.dependence_plot(column, self.shap_values, self.data[self.preds])
+
     def fit_and_predict(self):
         """Pipeline that run everything."""
         self.load_data()
-        self.retype_data()
+        self.preprocess_data()
+        if self.config["perform_OHE"]:
+            self.ohe_fit()
+            self.ohe_predict(
+                os.path.join(self.config["path_to_save"], "ohe_model.pickle")
+            )
         self.logger.info("Starting oof Cross Validation fit.")
         n_trees = self.train_model_CV()
         # Replace number of iteration for final model
