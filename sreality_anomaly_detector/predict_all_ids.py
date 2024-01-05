@@ -11,7 +11,7 @@ from sreality_anomaly_detector.configs import inference_model_config, prediction
 from sreality_anomaly_detector.lgbm_inferor import LGBMModelInferor
 from sreality_anomaly_detector.logger import add_logger, close_logger
 
-FLATS_TO_SEND = 15
+FLATS_TO_SEND = 20
 
 
 def reconstruct_url_from_id(flat_id: int):
@@ -42,6 +42,12 @@ def predict_data_to_all_ids(prediction_config: dict, inference_model_config: dic
     predictions = []
     urls = []
     flat_ids = []
+    top_1_increasing_price_feature = []
+    top_2_increasing_price_feature = []
+    top_3_increasing_price_feature = []
+    top_1_decreasing_price_feature = []
+    top_2_decreasing_price_feature = []
+    top_3_decreasing_price_feature = []
 
     logger.info("Making prediction for all flat ids")
     if prediction_config["model_source"] == "local":
@@ -67,19 +73,38 @@ def predict_data_to_all_ids(prediction_config: dict, inference_model_config: dic
                 flat_ids.append(flat_id)
                 predictions.append(prediction)
                 urls.append(flat_url)
+                top_1_increasing_price_feature.append(extracted_data["top_1_increasing_price_feature"])
+                top_2_increasing_price_feature.append(extracted_data["top_2_increasing_price_feature"])
+                top_3_increasing_price_feature.append(extracted_data["top_3_increasing_price_feature"])
+                top_1_decreasing_price_feature.append(extracted_data["top_1_decreasing_price_feature"])
+                top_2_decreasing_price_feature.append(extracted_data["top_2_decreasing_price_feature"])
+                top_3_decreasing_price_feature.append(extracted_data["top_3_decreasing_price_feature"])
                 logger.info(f"Prediction successful for ID {flat_id}")
             except json.JSONDecodeError:
                 logger.warning(f"Prediction unsuccessful for ID {flat_id}")
 
         else:
-            prediction = model.predict(flat_id)["prediction_minus_actual_price"]
+            prediction = model.predict(flat_id)
             flat_ids.append(flat_id)
-            predictions.append(prediction)
+            predictions.append(prediction["prediction_minus_actual_price"])
             urls.append(flat_url)
+            top_1_increasing_price_feature.append(prediction["top_1_increasing_price_feature"])
+            top_2_increasing_price_feature.append(prediction["top_2_increasing_price_feature"])
+            top_3_increasing_price_feature.append(prediction["top_3_increasing_price_feature"])
+            top_1_decreasing_price_feature.append(prediction["top_1_decreasing_price_feature"])
+            top_2_decreasing_price_feature.append(prediction["top_2_decreasing_price_feature"])
+            top_3_decreasing_price_feature.append(prediction["top_3_decreasing_price_feature"])
             logger.info(f"Prediction successful for ID {flat_id}")
 
     final_data = pd.DataFrame(
-        {"flat_id": flat_ids, "prediction_minus_actual": predictions, "url": urls}
+        {"flat_id": flat_ids, "prediction_minus_actual": predictions, "url": urls,
+         "top_1_increasing_price_feature": top_1_increasing_price_feature,
+         "top_1_decreasing_price_feature": top_1_decreasing_price_feature,
+         "top_2_increasing_price_feature": top_2_increasing_price_feature,
+         "top_2_decreasing_price_feature": top_2_decreasing_price_feature,
+         "top_3_increasing_price_feature": top_3_increasing_price_feature,
+         "top_3_decreasing_price_feature": top_3_decreasing_price_feature,
+         }
     )
     final_data = final_data.sort_values(
         by="prediction_minus_actual", ascending=False

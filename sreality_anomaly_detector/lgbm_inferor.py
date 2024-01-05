@@ -135,6 +135,7 @@ class LGBMModelInferor(LGBMMBaseModel):
         self.config = config
         self.model = None
         self.shap_explainer_model = None
+        self.shap_values = None
         with open(self.config["model_path"], "rb") as file:
             self.model = pickle.load(file)
         with open(self.config["shap_explainer_model_path"], "rb") as file:
@@ -155,7 +156,7 @@ class LGBMModelInferor(LGBMMBaseModel):
         else:
             self.shap_values = shap_values
 
-        self.shap_values = pd.DataFrame(shap_values)
+        self.shap_values = pd.DataFrame(self.shap_values.values)
 
         def extract_increasing_price_col(row, pos):
             """Extract feature that is increasing the price on position pos."""
@@ -227,6 +228,7 @@ class LGBMModelInferor(LGBMMBaseModel):
 
         if len(self.data) > 0:
             prediction = self.model.predict(self.data[self.preds])
+            self.predict_shap_values()
             prediction_minus_actual = prediction[0] - self.data["price"][0]
             top_1_increasing_price_feature = self.shap_values[
                 "top_1_increasing_price_feature"

@@ -26,18 +26,20 @@ local_prediction_config = {
 local_inference_model_config = {
     "model_path": (
         r"C:\Users\pacak\PycharmProjects\sreality_anomaly_detector"
-        r"\models\lgbm_model.pickle"),
+        r"\models\lgbm_model.pickle"
+    ),
     "ohe_model_path": (
         r"C:\Users\pacak\PycharmProjects\sreality_anomaly_detector"
-        r"\models\ohe_model.pickle"),
+        r"\models\ohe_model.pickle"
+    ),
     "shap_explainer_model_path": r"C:\Users\pacak\PycharmProjects\sreality_anomaly_detector\models\shap_explainer_model.pickle",
     "perform_OHE": False,
-    "filter_query": "price < 6000000 and floor!='-1'"
+    "filter_query": "price < 6000000 and floor!='-1'",
 }
 
-RUN_LOCAL_SCRAPER = True
-RUN_LOCAL_TRAINING = False
-RUN_LOCAL_PREDICTIONS = False
+RUN_LOCAL_SCRAPER = False
+RUN_LOCAL_TRAINING = True
+RUN_LOCAL_PREDICTIONS = True
 
 
 # Local Scrape of data

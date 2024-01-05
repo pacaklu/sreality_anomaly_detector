@@ -130,7 +130,7 @@ class LGBMModelTrainer(LGBMMBaseModel):
         )
         return booster
 
-    def print_shap_values(self, model: lgb.Booster, ret: bool = False):
+    def print_and_save_shap_values(self, model: lgb.Booster, ret: bool = False):
         """Compute SHAP values of the model for the data."""
         explainer = shap.TreeExplainer(model)
 
@@ -185,7 +185,7 @@ class LGBMModelTrainer(LGBMMBaseModel):
         self.logger.info("Starting of final model training.")
         final_model = self.final_model(self.data[self.preds], self.data[self.target])
         self.logger.info("Model succesfully trained.")
-
+        self.print_and_save_shap_values(final_model)
         self.data["predictions"] = final_model.predict(self.data[self.preds])
         self.logger.info("R2 score of final model:")
         self.logger.info(r2_score(self.data[self.target], self.data["predictions"]))
