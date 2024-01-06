@@ -8,6 +8,8 @@ import pandas as pd
 import requests
 
 from sreality_anomaly_detector.lgbm_base import LGBMMBaseModel
+from sreality_anomaly_detector.logger import add_logger
+
 
 # Coordinates of prague city centre
 CENTRE_COORD = (50.082164, 14.426307)
@@ -133,6 +135,7 @@ class LGBMModelInferor(LGBMMBaseModel):
         """Initialize class."""
         super().__init__()
         self.config = config
+        self.logger = add_logger("/data/predicting.log")
         self.model = None
         self.shap_explainer_model = None
         self.shap_values = None
@@ -140,6 +143,7 @@ class LGBMModelInferor(LGBMMBaseModel):
             self.model = pickle.load(file)
         with open(self.config["shap_explainer_model_path"], "rb") as file:
             self.shap_explainer_model = pickle.load(file)
+
 
     def _request_flat_data(self, input_flat_id: int) -> dict:
         """Request Sreality api with flat id to receive data."""
@@ -204,17 +208,17 @@ class LGBMModelInferor(LGBMMBaseModel):
 
     def predict(self, input_flat_id: int):
         """Predict price of the flat."""
-        print('STARTING PREDICTION IN INFEROR')
+        self.logger.info('STARTING PREDICTION IN INFEROR')
         obtained_json = self._request_flat_data(input_flat_id)
-        print('OBTAINED JSOn')
-        print(obtained_json)
+        self.logger.info('OBTAINED JSOn')
+        self.logger.info(obtained_json)
         preprocessed_data = extract_one_flat_details(obtained_json)
-        print('preprocessed_data')
-        print(preprocessed_data)
+        self.logger.info('preprocessed_data')
+        self.logger.info(preprocessed_data)
         self.data = pd.DataFrame(preprocessed_data, index=[0])
         try:
             self.preprocess_data()
-            print(self.data)
+            self.logger.info(self.data)
             if self.config["perform_OHE"]:
                 self.ohe_predict(self.config["ohe_model_path"])
         except KeyError:
