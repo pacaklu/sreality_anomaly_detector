@@ -69,8 +69,11 @@ def predict_data_to_all_ids(prediction_config: dict, inference_model_config: dic
             logger.info(f"FLAT URL API")
             logger.info(api_url)
             try:
+                logger.info(f"sending request to api")
                 r = requests.post(url=api_url, timeout=15)
                 extracted_data = r.json()
+                logger.info(f"received data")
+                logger.info(f"extracted_data")
                 prediction = extracted_data["prediction_minus_actual_price"]
                 flat_ids.append(flat_id)
                 predictions.append(prediction)
