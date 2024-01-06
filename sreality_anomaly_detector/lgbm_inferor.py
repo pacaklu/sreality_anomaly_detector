@@ -204,11 +204,17 @@ class LGBMModelInferor(LGBMMBaseModel):
 
     def predict(self, input_flat_id: int):
         """Predict price of the flat."""
+        print('STARTING PREDICTION IN INFEROR')
         obtained_json = self._request_flat_data(input_flat_id)
+        print('OBTAINED JSOn')
+        print(obtained_json)
         preprocessed_data = extract_one_flat_details(obtained_json)
+        print('preprocessed_data')
+        print(preprocessed_data)
         self.data = pd.DataFrame(preprocessed_data, index=[0])
         try:
             self.preprocess_data()
+            print(self.data)
             if self.config["perform_OHE"]:
                 self.ohe_predict(self.config["ohe_model_path"])
         except KeyError:
