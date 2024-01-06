@@ -66,6 +66,8 @@ def predict_data_to_all_ids(prediction_config: dict, inference_model_config: dic
 
         if prediction_config["model_source"] == "API":
             api_url = prediction_config["api_url"] + str(flat_id)
+            logger.info(f"FLAT URL API")
+            logger.info(api_url)
             try:
                 r = requests.post(url=api_url, timeout=15)
                 extracted_data = r.json()

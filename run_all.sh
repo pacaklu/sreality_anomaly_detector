@@ -8,11 +8,11 @@ docker rm -vf $(docker ps -aq)
 # Delete all images
 docker rmi -f $(docker images -aq)
 
-docker build -f dockerfiles/scrape.Dockerfile  . -t scraper
-docker run -v /home/ec2-user/data/:/data/ scraper
+#docker build -f dockerfiles/scrape.Dockerfile  . -t scraper
+#docker run -v /home/ec2-user/data/:/data/ scraper
 
-docker build -f dockerfiles/training.Dockerfile . -t trainer_image
-docker run -v /home/ec2-user/data/:/data -v /home/ec2-user/models/:/models trainer_image
+#docker build -f dockerfiles/training.Dockerfile . -t trainer_image
+#docker run -v /home/ec2-user/data/:/data -v /home/ec2-user/models/:/models trainer_image
 
 docker build -f dockerfiles/api.Dockerfile . -t api
 docker run -v /home/ec2-user/models/:/models -d -p 8000:8000 api
