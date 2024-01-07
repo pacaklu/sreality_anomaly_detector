@@ -50,7 +50,7 @@ def predict_data_to_all_ids(prediction_config: dict, inference_model_config: dic
     top_3_decreasing_price_feature = []
 
     logger.info("Making prediction for all flat ids")
-    if prediction_config["model_source"] == "local":
+    if prediction_config["model_source"] == "LOCAL":
         model = LGBMModelInferor(inference_model_config)
 
     for flat_id in tqdm(flat_ids_to_test):
