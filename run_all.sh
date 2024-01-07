@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 USE_API=False
 
@@ -20,8 +20,7 @@ docker build -f dockerfiles/training.Dockerfile . -t trainer_image
 echo "Running model trainer image."
 docker run -v /home/ec2-user/data/:/data -v /home/ec2-user/models/:/models trainer_image
 
-if [$USE_API -eq True]
-then
+if [ $USE_API = "True"]; then 
   echo "Building model api image."
   docker build -f dockerfiles/api.Dockerfile . -t api
   echo "Running model api image."
