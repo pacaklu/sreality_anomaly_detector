@@ -47,7 +47,7 @@ class SrealityScraper:
     def obtain_ids_of_all_available_flats(self):
         """Collect ids of all available flats."""
         list_of_flat_ids = []
-        for page_number in tqdm(range(1)): #tqdm(range(self.number_of_pages_to_scrap)):
+        for page_number in tqdm(range(self.number_of_pages_to_scrap)):
             url = (
                 f"https://www.sreality.cz/api/cs/v2/"
                 f"estates?category_sub_cb=4|5&category_main_cb=1&"
