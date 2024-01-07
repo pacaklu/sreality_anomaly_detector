@@ -1,6 +1,6 @@
 #!/bin/sh
 
-USE_API=False
+USE_API="False"
 
 cd /home/ec2-user/sreality_anomaly_detector
 git pull
@@ -20,7 +20,7 @@ docker build -f dockerfiles/training.Dockerfile . -t trainer_image
 echo "Running model trainer image."
 docker run -v /home/ec2-user/data/:/data -v /home/ec2-user/models/:/models trainer_image
 
-if [ $USE_API = "True"]; then 
+if [ $USE_API = "True" ]; then
   echo "Building model api image."
   docker build -f dockerfiles/api.Dockerfile . -t api
   echo "Running model api image."
