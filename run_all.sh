@@ -35,7 +35,7 @@ else
   echo "Building model predictions image."
   docker build -f dockerfiles/predict.Dockerfile . -t prediction_image
   echo "Running model predictions image."
-  docker run -v /home/ec2-user/data/:/data/ -v /home/ec2-user/models/:/models
+  docker run -v /home/ec2-user/data/:/data/ -v /home/ec2-user/models/:/models prediction_image
 
 fi
 
