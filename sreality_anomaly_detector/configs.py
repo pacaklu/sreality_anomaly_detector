@@ -17,5 +17,5 @@ training_config = {
 prediction_config = {
     "data_path": "/data/",
     "api_url": "http://localhost:8000/predict?input_data=",
-    "model_source": "API",
+    "model_source": "LOCAL", # LOCAL or API available
 }
