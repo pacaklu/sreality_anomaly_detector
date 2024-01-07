@@ -25,15 +25,19 @@ if [ $USE_API = "True" ]; then
   docker build -f dockerfiles/api.Dockerfile . -t api
   echo "Running model api image."
   docker run -v /home/ec2-user/models/:/models -d -p 8000:8000 api
+  # Can be tested with following command
+  #curl -X POST http://localhost:8000/predict?input_data=4065768524
+  echo "Building model predictions image."
+  docker build -f dockerfiles/predict.Dockerfile . -t prediction_image
+  echo "Running model predictions image."
+  docker run -v /home/ec2-user/data/:/data/  --network host prediction_image
+else
+  echo "Building model predictions image."
+  docker build -f dockerfiles/predict.Dockerfile . -t prediction_image
+  echo "Running model predictions image."
+  docker run -v /home/ec2-user/data/:/data/ -v /home/ec2-user/models/:/models
+
 fi
-
-# Can be tested with following command
-#curl -X POST http://localhost:8000/predict?input_data=4065768524
-
-echo "Building model predictions image."
-docker build -f dockerfiles/predict.Dockerfile . -t prediction_image
-echo "Running model predictions image."
-docker run -v /home/ec2-user/data/:/data/ --network host prediction_image
 
 # STOP ALL
 echo "Stopping all containers."
